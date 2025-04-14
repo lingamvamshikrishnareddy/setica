@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Roadmap | Setica - The Everything App for Your Life</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- GSAP Animation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+
+  <style>
+    /* Basic styling for loader visibility */
+    .loader-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #111; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease-out, visibility 0.5s ease-out; }
+    .loader { border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loaded .loader-wrapper { opacity: 0; visibility: hidden; }
+    /* Basic Style for Love Counter in Footer */
+     .footer-love { display: flex; align-items: center; gap: 10px; background-color: rgba(255, 255, 255, 0.08); padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: background-color 0.3s ease; user-select: none; }
+     .footer-love:hover { background-color: rgba(255, 255, 255, 0.15); }
+     .footer-love .heart-icon { color: #ff4757; font-size: 1.1rem; transition: transform 0.2s ease; }
+     .footer-love.loved .heart-icon { transform: scale(1.2); }
+     .footer-love .love-count { font-weight: 600; font-size: 0.9rem; color: var(--text-color); }
+     .footer-love .love-text { font-size: 0.9rem; color: var(--text-muted); }
+
+    /* --- Styles specific to Roadmap Page --- */
+    .page-header {
+      min-height: 300px; display: flex; flex-direction: column; justify-content: center;
+      align-items: center; text-align: center; position: relative;
+      padding: 120px 5% 60px; background-color: var(--dark-bg);
+      overflow: hidden; /* Contain stars */
+    }
+     .page-header h1 { font-size: clamp(2.2rem, 5vw, 3.5rem); color: var(--text-color); margin-bottom: 1rem; position: relative; z-index: 2;}
+     .page-header p { font-size: clamp(1rem, 2vw, 1.2rem); max-width: 700px; margin: 0 auto; position: relative; z-index: 2;}
+
+    /* Star Background Styles (from index.html if needed) */
+    .stars, .twinkling { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; display: block; z-index: 0;}
+    .stars { background: #000 url(https://www.script-tutorials.com/demos/360/images/stars.png) repeat top center; z-index: 0; }
+    .twinkling{ background: transparent url(https://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center; z-index: 1; animation: move-twink-back 200s linear infinite; }
+    @keyframes move-twink-back { from {background-position:0 0;} to {background-position:-10000px 5000px;} }
+
+
+    .roadmap-section {
+      padding: 80px 5%;
+      background-color: var(--dark-card); /* Use card background */
+      position: relative; /* Needed if adding shapes/gradients */
+      z-index: 2; /* Ensure content is above footer */
+    }
+
+    .roadmap-timeline {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      padding: 40px 0;
+    }
+
+    /* The vertical timeline bar */
+    .roadmap-timeline::before {
+      content: '';
+      position: absolute;
+      left: 50px; /* Position relative to timeline items */
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+      border-radius: 2px;
+      opacity: 0.5;
+    }
+
+    .timeline-phase {
+      margin-bottom: 60px;
+      position: relative; /* For timeline bar connection */
+    }
+     .timeline-phase:last-child { margin-bottom: 0; }
+
+    .phase-header {
+      background: var(--gradient-primary);
+      color: white;
+      padding: 15px 30px;
+      border-radius: var(--border-radius);
+      display: inline-block;
+      margin-bottom: 30px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      box-shadow: var(--box-shadow);
+      position: relative;
+      left: -15px; /* Offset slightly for visual balance */
+      z-index: 2; /* Above timeline bar */
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-left: 100px; /* Space for icon and line */
+      margin-bottom: 40px;
+      background-color: rgba(255, 255, 255, 0.04);
+      padding: 25px 30px 25px 100px; /* Adjust padding */
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: var(--transition);
+      overflow: hidden; /* Ensure hover effects stay within */
+    }
+     .timeline-item:hover {
+         background-color: rgba(255, 255, 255, 0.07);
+         border-color: rgba(var(--primary-color-rgb, 74, 85, 255), 0.3);
+         transform: translateX(5px);
+     }
+
+    /* Icon on the timeline */
+    .timeline-icon {
+      position: absolute;
+      left: 30px; /* Align with center of the timeline bar (50px - width/2) */
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--dark-card); /* Match section background */
+      border: 3px solid var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3; /* Above timeline item background */
+    }
+    .timeline-icon i {
+      color: var(--primary-color);
+      font-size: 1.2rem;
+    }
+    /* Status-specific icon colors */
+    .timeline-item.status-development .timeline-icon { border-color: var(--primary-color); background-color: var(--dark-bg);}
+    .timeline-item.status-development .timeline-icon i { color: var(--primary-color); }
+    .timeline-item.status-planned .timeline-icon { border-color: var(--secondary-color); background-color: var(--dark-bg);}
+    .timeline-item.status-planned .timeline-icon i { color: var(--secondary-color); }
+     .timeline-item.status-research .timeline-icon { border-color: #00b894; background-color: var(--dark-bg); } /* Teal */
+     .timeline-item.status-research .timeline-icon i { color: #00b894; }
+
+    .timeline-content h3 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: var(--text-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    }
+    .timeline-content p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
+    .status-tag-roadmap {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 15px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 15px;
+      vertical-align: middle;
+      white-space: nowrap; /* Prevent tag wrapping */
+    }
+    .status-development .status-tag-roadmap { background-color: rgba(74, 85, 255, 0.2); color: var(--primary-color); }
+    .status-planned .status-tag-roadmap { background-color: rgba(255, 111, 0, 0.2); color: var(--secondary-color); }
+    .status-research .status-tag-roadmap { background-color: rgba(0, 184, 148, 0.2); color: #00b894; }
+
+
+    @media (max-width: 768px) {
+        .roadmap-timeline::before { left: 25px; } /* Adjust line position */
+        .timeline-item { padding-left: 70px; padding-right: 20px; }
+        .timeline-icon { left: 5px; /* Move icon closer */ }
+        .phase-header { font-size: 1.2rem; padding: 12px 20px; left: 0;}
+        .timeline-content h3 { flex-direction: column; align-items: flex-start; gap: 5px;}
+        .status-tag-roadmap { margin-left: 0; margin-top: 5px; }
+    }
+
+  </style>
+</head>
+<body class="loading">
+  <div class="loader-wrapper"> <div class="loader"></div> </div>
+
+  <nav>
+    <div class="nav-container">
+      <div class="logo">
+        <a href="index.html"><img src="openart-image_9Aq3L7vH_1744551909797_raw.jpg" alt="Setica Logo"></a>
+      </div>
+      <div class="nav-links">
+        <a href="solutions.html">Solutions</a>
+        <a href="about.html">About</a>
+        <a href="products.html" class="active">Products</a> <!-- Active Link -->
+      </div>
+      <div class="cta-buttons">
+        <a href="join-waitlist.html" class="btn btn-primary" id="nav-start-free">Join Waitlist</a>
+      </div>
+      <div class="hamburger"> <span></span> <span></span> <span></span> </div>
+    </div>
+  </nav>
+
+  <header class="page-header">
+    <div class="stars"></div> <div class="twinkling"></div>
+    <div class="header-content" style="z-index: 5;">
+      <h1>Product Roadmap</h1>
+      <p>Our journey towards a unified platform. See what we're building and what's next.</p>
+    </div>
+  </header>
+
+  <!-- Main Content Section for Roadmap -->
+  <section class="roadmap-section">
+    <div class="roadmap-timeline">
+
+        <!-- Phase 1: Foundation & Core Services -->
+        <div class="timeline-phase">
+            <div class="phase-header">Phase 1: Foundation & Core Services</div>
+            <!-- Item 1: Telehealth -->
+            <div class="timeline-item status-development">
+                <div class="timeline-icon"><i class="fas fa-briefcase-medical"></i></div>
+                <div class="timeline-content">
+                    <h3>Telehealth Platform <span class="status-tag-roadmap">In Development</span></h3>
+                    <p>Core infrastructure for virtual consultations, secure health data management, and scheduling.</p>
+                </div>
+            </div>
+             <!-- Item 2: Jobs Platform -->
+             <div class="timeline-item status-development">
+                <div class="timeline-icon"><i class="fas fa-hard-hat"></i></div>
+                <div class="timeline-content">
+                    <h3>Jobs Platform (Blue Collar Focus) <span class="status-tag-roadmap">In Development</span></h3>
+                    <p>Connecting skilled tradespeople and essential workers with opportunities. Profile building, AI matching.</p>
+                </div>
+            </div>
+            <!-- Item 3: Health & Fitness Hub -->
+            <div class="timeline-item status-development">
+                <div class="timeline-icon"><i class="fas fa-heartbeat"></i></div>
+                <div class="timeline-content">
+                    <h3>Health & Fitness Hub <span class="status-tag-roadmap">In Development</span></h3>
+                    <p>Centralized tracking for nutrition, workouts, fasting cycles, and wellness goals. Wearable integration.</p>
+                </div>
+            </div>
+            <!-- Item 4: Women's Safety Features V1 -->
+             <div class="timeline-item status-development">
+                 <div class="timeline-icon"><i class="fas fa-female"></i></div>
+                 <div class="timeline-content">
+                     <h3>Women's Safety Features V1 <span class="status-tag-roadmap">In Development</span></h3>
+                     <p>Initial rollout of core safety features like SOS alerts and trusted contact sharing.</p>
+                 </div>
+            </div>
+        </div>
+
+        <!-- Phase 2: Expanding Services & Integrations -->
+        <div class="timeline-phase">
+            <div class="phase-header">Phase 2: Service Expansion & Integration</div>
+             <!-- Item 5: Quick Commerce -->
+            <div class="timeline-item status-planned">
+                <div class="timeline-icon"><i class="fas fa-shipping-fast"></i></div>
+                <div class="timeline-content">
+                    <h3>Quick Commerce Network <span class="status-tag-roadmap">Planned</span></h3>
+                    <p>Connecting users with local stores for rapid delivery of groceries and everyday essentials.</p>
+                </div>
+            </div>
+             <!-- Item 6: Construction & Trades Tools -->
+            <div class="timeline-item status-planned">
+                <div class="timeline-icon"><i class="fas fa-tools"></i></div>
+                <div class="timeline-content">
+                    <h3>Construction & Trades Tools (SaaS) <span class="status-tag-roadmap">Planned</span></h3>
+                    <p>Digital tools for project management, scheduling, and communication tailored for the construction industry.</p>
+                </div>
+            </div>
+             <!-- Item 7: Ride Sharing (Vayu) Integration -->
+             <div class="timeline-item status-planned">
+                 <div class="timeline-icon"><i class="fas fa-car"></i></div>
+                 <div class="timeline-content">
+                     <h3>Ride Sharing (Vayu) <span class="status-tag-roadmap">Planned</span></h3>
+                     <p>Integration of ride-hailing services within the Setica ecosystem for seamless transportation.</p>
+                 </div>
+            </div>
+            <!-- Item 8: Event Management (Gatherly) -->
+             <div class="timeline-item status-planned">
+                 <div class="timeline-icon"><i class="fas fa-calendar-alt"></i></div>
+                 <div class="timeline-content">
+                     <h3>Event Management (Gatherly) <span class="status-tag-roadmap">Planned</span></h3>
+                     <p>Tools for organizing personal events, managing RSVPs, community gathering discovery, and niche events like weddings.</p>
+                 </div>
+            </div>
+             <!-- Item 9: Restaurant Tech Integration -->
+             <div class="timeline-item status-planned">
+                <div class="timeline-icon"><i class="fas fa-utensils"></i></div>
+                <div class="timeline-content">
+                    <h3>Restaurant Tech Integration <span class="status-tag-roadmap">Planned</span></h3>
+                    <p>Features for reservations, ordering, and potentially supporting specific dietary needs (e.g., Veg App focus).</p>
+                </div>
+           </div>
+        </div>
+
+         <!-- Phase 3: Ecosystem Growth & Future Research -->
+         <div class="timeline-phase">
+            <div class="phase-header">Phase 3 & Beyond: Ecosystem & Future Tech</div>
+             <!-- Item 10: Integrated Fintech -->
+             <div class="timeline-item status-research">
+                <div class="timeline-icon"><i class="fas fa-coins"></i></div>
+                <div class="timeline-content">
+                    <h3>Integrated Fintech Suite <span class="status-tag-roadmap">Research</span></h3>
+                    <p>Exploring secure budgeting, P2P payments, investment tracking (Stock AI concepts), and financial wellness features.</p>
+                </div>
+            </div>
+             <!-- Item 11: Real Estate Management (Remis) -->
+              <div class="timeline-item status-research">
+                  <div class="timeline-icon"><i class="fas fa-home"></i></div>
+                  <div class="timeline-content">
+                      <h3>Real Estate Tools (Remis) <span class="status-tag-roadmap">Research</span></h3>
+                      <p>Developing tools for property searching, management, and related services within the platform.</p>
+                  </div>
+             </div>
+             <!-- Item 12: Enhanced AI & Automation -->
+             <div class="timeline-item status-research">
+                 <div class="timeline-icon"><i class="fas fa-cogs"></i></div>
+                 <div class="timeline-content">
+                     <h3>AI & Automation Expansion <span class="status-tag-roadmap">Research</span></h3>
+                     <p>Deeper AI integration for proactive assistance, workflow automation, and personalization across all modules (DataSense concepts).</p>
+                 </div>
+            </div>
+             <!-- Item 13: Specialized Industry Tools -->
+              <div class="timeline-item status-research">
+                 <div class="timeline-icon"><i class="fas fa-industry"></i></div>
+                 <div class="timeline-content">
+                     <h3>Specialized Industry Solutions <span class="status-tag-roadmap">Research</span></h3>
+                     <p>Exploring tools for manufacturing management, energy distribution marketplaces, and other niche verticals.</p>
+                 </div>
+            </div>
+             <!-- Item 14: Communication & Collaboration -->
+              <div class="timeline-item status-research">
+                 <div class="timeline-icon"><i class="fas fa-comments"></i></div>
+                 <div class="timeline-content">
+                     <h3>Communication & Collaboration Hub <span class="status-tag-roadmap">Research</span></h3>
+                     <p>Investigating integrated secure email (Patrmail), team sync features, and potentially creator/influencer tools.</p>
+                 </div>
+            </div>
+             <!-- Item 15: Developer Platform -->
+              <div class="timeline-item status-research">
+                 <div class="timeline-icon"><i class="fas fa-plug"></i></div>
+                 <div class="timeline-content">
+                     <h3>Developer Platform (API/SDK) <span class="status-tag-roadmap">Research</span></h3>
+                     <p>Planning APIs and SDKs (like Almanac concept) to enable third-party integrations and ecosystem expansion.</p>
+                 </div>
+            </div>
+             <!-- Item 16: Niche Lifestyle Support -->
+              <div class="timeline-item status-research">
+                  <div class="timeline-icon"><i class="fas fa-leaf"></i></div>
+                  <div class="timeline-content">
+                      <h3>Niche Lifestyle Support <span class="status-tag-roadmap">Research</span></h3>
+                      <p>Exploring tailored services like online tailoring, divorce support resources, and specific community features (e.g., Nexora-like content). </p>
+                  </div>
+             </div>
+            <!-- Add more research items if needed, potentially grouping very futuristic ones like Car SaaS, Neurolink under advanced R&D -->
+
+        </div>
+
+    </div> <!-- /.roadmap-timeline -->
+  </section>
+  <!-- End Main Content Section -->
+
+  <section id="cta" class="cta-section">
+     <div class="overlay"></div>
+     <div class="cta-content">
+       <h2>Follow Our Progress</h2>
+       <p>Join the waitlist to receive updates as we move through our roadmap and approach launch.</p>
+       <a href="join-waitlist.html" class="btn btn-cta" id="cta-start-free">JOIN WAITLIST →</a>
+     </div>
+   </section>
+
+   <footer>
+    <div class="footer-container">
+        <div class="footer-left"> 
+          <img src="openart-image_9Aq3L7vH_1744551909797_raw.jpg" alt="Setica Logo"> 
+          <p>Copyright © <span id="copyright-year">2024</span> Setica.<br>All rights reserved.</p> 
+          <p style="margin-top: 15px; font-size: 0.8rem;">An open-source initiative.</p> 
+        </div>
+        <div class="footer-links"> 
+          <div class="footer-column"> 
+            <h3>Platform</h3> 
+            <ul> 
+              <li><a href="solutions.html">Solutions</a></li> 
+              <li><a href="products.html">Product Roadmap</a></li> 
+              <li><a href="about.html">About Setica</a></li> 
+            </ul> 
+          </div> 
+          <div class="footer-column" id="resources"> 
+            <h3>Resources</h3> 
+            <ul> 
+              <li><a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li> 
+              <li><a href="#">Documentation (Upcoming)</a></li> 
+              <li><a href="#">API Reference (Upcoming)</a></li> 
+              <li><a href="#">Contribution Guide</a></li> 
+            </ul> 
+          </div> 
+          <div class="footer-column"> 
+            <h3>Company</h3> 
+            <ul> 
+              <li><a href="about.html">About Us</a></li> 
+              <li><a href="#">Careers (Coming Soon)</a></li> 
+              <li><a href="mailto:lingamvamshikrishnareddy@gmail.com">Contact</a></li> 
+              <li><a href="#">Privacy Policy</a></li> 
+            </ul> 
+          </div> 
+        </div>
+        <div class="footer-social"> 
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a> 
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a> 
+          <a href="https://github.com/your-setica-repo" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a> 
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a> 
+        </div>
+      </div>
+      <div class="footer-bottom"> 
+        <p>Made with <i class="fas fa-heart heart-icon"></i> and Open Source principles. Site developed with assistance from Claude.</p> 
+        <div class="footer-love" id="love-it-button"> 
+          <span class="love-text">Loved it?</span> 
+          <span class="heart-icon">❤️</span> 
+          <span class="love-count" id="love-counter">0</span> 
+        </div> 
+      </div>
+  </footer>
+
+  <!-- Inline script (same basic setup + GSAP animation) -->
+  <script>
+     document.addEventListener('DOMContentLoaded', () => {
+        const body = document.body;
+        // --- Loader ---
+        window.addEventListener('load', () => { body.classList.remove('loading'); body.classList.add('loaded'); const loaderWrapper = document.querySelector('.loader-wrapper'); if (loaderWrapper) { gsap.to(loaderWrapper, { opacity: 0, visibility: 'hidden', duration: 0.5, ease: 'power1.out' }); } });
+        body.classList.add('loading'); // Add loading class initially
+
+        // --- Dynamic Copyright Year ---
+        const yearSpan = document.getElementById('copyright-year'); if (yearSpan) { yearSpan.textContent = new Date().getFullYear(); }
+
+        // --- Mobile Menu ---
+        const hamburger = document.querySelector('.hamburger'); const mobileMenu = document.querySelector('.nav-links'); if (hamburger && mobileMenu) { hamburger.addEventListener('click', () => { hamburger.classList.toggle('active'); mobileMenu.classList.toggle('active'); }); }
+
+        // --- Love Counter Logic ---
+        const loveButton = document.getElementById('love-it-button'); const loveCounterSpan = document.getElementById('love-counter'); const localStorageKey = 'seticaLoveCount'; const lovedStateKey = 'seticaLovedState'; let currentLoveCount = parseInt(localStorage.getItem(localStorageKey) || '0'); let userHasLoved = localStorage.getItem(lovedStateKey) === 'true'; function updateLoveDisplay() { if(loveCounterSpan) loveCounterSpan.textContent = currentLoveCount; if(loveButton) { if(userHasLoved) loveButton.classList.add('loved'); else loveButton.classList.remove('loved'); } }
+        if (loveButton && loveCounterSpan) { updateLoveDisplay(); loveButton.addEventListener('click', () => { if (!userHasLoved) { currentLoveCount++; userHasLoved = true; localStorage.setItem(localStorageKey, currentLoveCount); localStorage.setItem(lovedStateKey, 'true'); updateLoveDisplay(); gsap.fromTo(loveButton.querySelector('.heart-icon'), { scale: 1 }, { scale: 1.4, duration: 0.3, ease: 'back.out(3)', yoyo: true, repeat: 1 }); } else { gsap.fromTo(loveButton, {x: 0}, {x: 5, duration:0.1, repeat: 3, yoyo: true, clearProps: "x"}); } }); }
+
+        // --- Nav Scroll Effect ---
+        const nav = document.querySelector('nav'); if (nav) { ScrollTrigger.create({ start: "top top", end: 99999, onUpdate: (self) => { if (self.scroll() > 50) { nav.classList.add('scrolled'); } else { nav.classList.remove('scrolled'); } } }); }
+
+        // --- GSAP Animations for Roadmap Items ---
+         if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+            // Animate Timeline Items
+             gsap.utils.toArray('.timeline-item').forEach(item => {
+                 gsap.from(item, {
+                     scrollTrigger: {
+                         trigger: item,
+                         start: "top 85%", // Start animation when item is 85% in view
+                         end: "bottom 15%",
+                         toggleActions: "play none none reverse", // Play on enter, reverse on leave
+                         // markers: true // uncomment for debugging
+                     },
+                     opacity: 0,
+                     x: -60, // Slide in from left slightly further
+                     duration: 0.6,
+                     ease: "power2.out",
+                     delay: 0.1 // Slight stagger
+                 });
+             });
+             // Animate Phase Headers
+             gsap.utils.toArray('.phase-header').forEach(item => {
+                 gsap.from(item, {
+                      scrollTrigger: {
+                         trigger: item,
+                         start: "top 90%", // Start a bit earlier
+                         toggleActions: "play none none reverse",
+                     },
+                     opacity: 0,
+                     y: 40, // Fade up
+                     duration: 0.5,
+                     ease: "power1.out"
+                 });
+             });
+              // Animate the timeline bar growth
+              const timelineBar = document.querySelector('.roadmap-timeline::before');
+              if (timelineBar) { // Note: ::before is pseudo-element, harder to animate directly with JS. An alternative: animate a real div element styled like the bar.
+                // Workaround: Animate the container and assume bar is relative. Or animate properties of the container that affect pseudo element display.
+                gsap.from('.roadmap-timeline', { // Animate container opacity/scale as proxy
+                    scrollTrigger: {
+                        trigger: '.roadmap-timeline',
+                        start: "top 70%",
+                        end: "bottom top", // Covers the whole timeline visibility
+                         toggleActions: "play none none reverse"
+                    },
+                     opacity: 0,
+                     duration: 1
+                })
+              } else { // More direct approach: create a real div for the line
+                 // E.g. <div class="timeline-line"></div> positioned absolutely, then animate its height/scaleY
+              }
+         }
+
+    });
+  </script>
+
+</body>
+</html>
