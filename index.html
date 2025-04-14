@@ -69,28 +69,83 @@
       </div>
     </div>
   </nav>
-
+  <div class="mobile-menu-overlay"></div> 
   <header class="hero">
-    <div class="stars"></div>
-    <div class="twinkling"></div>
     <div class="hero-content">
       <h1 class="animate-text">Setica: Simplify Your Life</h1>
       <p class="animate-text-delay">
         An open-source platform designed as an all-in-one solution for your life.<br>
         Technology that makes life easier—coming soon.
       </p>
-      <!-- Example: If you had buttons here, link them appropriately -->
-      <!-- <div class="cta-buttons">
-         <a href="join-waitlist.html" class="btn btn-primary btn-hero">Join Waitlist</a>
-         <a href="about.html" class="btn btn-secondary btn-secondary-hero">Learn More</a>
-      </div> -->
     </div>
     <div class="scroll-indicator">
       <p>SCROLL TO EXPLORE</p>
       <i class="fas fa-chevron-down"></i>
     </div>
   </header>
-
+  
+  <style>
+    .hero {
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-image: url('./images/vamshikrishnareddy_Lingam_Prompt_Idea__Visualize_the_energy_of_innovation_or_b595443b-4102-43ee-9ef5-dd0fefee1997.jpg'); /* Replace with your actual image URL */
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      color: white;
+      text-align: center;
+    }
+    
+    .hero-content {
+      padding: 2rem;
+      z-index: 2;
+    }
+    
+    .animate-text {
+      opacity: 0;
+      animation: fadeIn 1.5s ease-in forwards;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .animate-text-delay {
+      opacity: 0;
+      animation: fadeIn 1.5s ease-in forwards;
+      animation-delay: 0.5s;
+      font-size: 1.2rem;
+      line-height: 1.6;
+    }
+    
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: bounce 2s infinite;
+    }
+    
+    .scroll-indicator p {
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+  </style>
   <section id="innovation" class="dark-section">
     <div class="section-wrapper">
       <div class="content-left">
@@ -110,7 +165,7 @@
      <div class="section-wrapper reverse">
        <div class="content-left">
          <div class="image-container">
-            <img src="https://via.placeholder.com/600x450?text=Setica+Interface+Concept" alt="Setica Concept Art" style="border-radius: var(--border-radius); box-shadow: var(--box-shadow);">
+            <img src="./images/vamshikrishnareddy_Lingam__imagine_prompt__Cinematic_3D_render,_hero_shot_fo_db906f8d-3e51-449f-896b-7014873b1156.jpg" alt="Setica Concept Art" style="border-radius: var(--border-radius); box-shadow: var(--box-shadow);">
          </div>
        </div>
        <div class="content-right">
