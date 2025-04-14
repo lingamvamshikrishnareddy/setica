@@ -11,8 +11,14 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Update the CORS configuration
+app.use(cors({
+  origin: ['https://your-netlify-domain.com', 'http://localhost:3000'],
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
+
 // Middleware
-app.use(cors());
 app.use(bodyParser.json());
 
 // Connect to MongoDB (replace with your MongoDB URL)
@@ -102,22 +108,22 @@ app.post('/api/interest-count/increment', async (req, res) => {
 app.post('/api/waitlist', async (req, res) => {
   try {
     const { email } = req.body;
-    
+
     // Validate email
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: 'Invalid email address' });
     }
-    
+
     // Check if email already exists
     const existingEmail = await Waitlist.findOne({ email });
     if (existingEmail) {
       return res.status(409).json({ error: 'Email already on waitlist' });
     }
-    
+
     // Add to waitlist
     const newEntry = new Waitlist({ email });
     await newEntry.save();
-    
+
     res.status(201).json({ success: true, message: 'Added to waitlist' });
   } catch (err) {
     console.error('Error adding to waitlist:', err);
