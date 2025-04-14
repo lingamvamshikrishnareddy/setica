@@ -85,83 +85,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- MOBILE MENU ---
-    const hamburger = document.querySelector('.hamburger');
-    const mobileMenu = document.querySelector('.mobile-menu');
-    // Ensure mobile menu exists in HTML or create dynamically if needed
-    if (hamburger && !mobileMenu) {
-         console.warn("Mobile menu structure not found in HTML. Hamburger button may not work.");
-     } else if (hamburger && mobileMenu) {
-        const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay') || createMobileOverlay(); // Create if missing
-        const closeMenuButton = mobileMenu.querySelector('.close-menu'); // Assuming close button is inside menu
-        const mobileNavLinks = mobileMenu.querySelectorAll('a[href^="#"]');
-
-         function createMobileOverlay() {
-             const overlay = document.createElement('div');
-             overlay.className = 'mobile-menu-overlay';
-             document.body.appendChild(overlay);
-             return overlay;
-         }
+    // Add this to your existing script.js file or replace the current hamburger menu functionality
 
 
-        function openMobileMenu() {
-            if (!mobileMenu || !mobileMenuOverlay) return;
-             // Ensure body overflow is handled correctly
-             document.body.style.overflow = 'hidden'; // Prevent background scroll
-
-            gsap.to(mobileMenu, { right: 0, duration: 0.4, ease: 'power2.out' });
-            gsap.to(mobileMenuOverlay, { opacity: 1, visibility: 'visible', duration: 0.4 });
-            mobileMenu.classList.add('active');
-            mobileMenuOverlay.classList.add('active');
-        }
-
-        function closeMobileMenu(callback = null) {
-             if (!mobileMenu || !mobileMenuOverlay || !mobileMenu.classList.contains('active')) return; // Prevent multiple calls
-
-            gsap.to(mobileMenu, {
-                 right: '-350px', // Ensure it goes off-screen
-                 duration: 0.4,
-                 ease: 'power2.in',
-                 onComplete: () => {
-                    // Reset body overflow only AFTER menu is closed
-                     document.body.style.overflow = '';
-                     mobileMenu.classList.remove('active');
-                     if (callback && typeof callback === 'function') {
-                         callback();
-                     }
-                 }
-            });
-            gsap.to(mobileMenuOverlay, { opacity: 0, visibility: 'hidden', duration: 0.4 });
-            mobileMenuOverlay.classList.remove('active');
-        }
-
-        hamburger.addEventListener('click', openMobileMenu);
-
-         if (closeMenuButton) {
-             closeMenuButton.addEventListener('click', closeMobileMenu);
-         } else {
-             console.warn("Close button for mobile menu not found.");
-         }
-
-        mobileMenuOverlay.addEventListener('click', closeMobileMenu);
-
-        // Close menu when a link is clicked
-        mobileNavLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                const targetId = link.getAttribute('href');
-                 // Always close the menu first, then scroll if it's an internal link
-                 closeMobileMenu(() => {
-                     if (targetId.startsWith('#')) {
-                         scrollToTarget(targetId);
-                     } else {
-                         // Handle external links normally if needed, but they won't trigger scroll
-                         window.location.href = targetId; // Or handle as appropriate
-                     }
-                 });
-                e.preventDefault(); // Prevent immediate jump for '#' links
-            });
-        });
-    }
 
     // --- SMOOTH SCROLLING HELPER ---
      let isScrolling = false; // Flag to prevent overlapping scroll animations
