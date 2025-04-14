@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 // Update the CORS configuration
 app.use(cors({
-  origin: ['https://your-netlify-domain.com', 'http://localhost:3000'],
+  origin: ['https://setica.netlify.app', 'https://setica.in','http://localhost:3000'],
   methods: ['GET', 'POST'],
   credentials: true
 }));
