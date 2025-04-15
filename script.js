@@ -1,219 +1,472 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if GSAP and plugins are loaded
+    const body = document.body;
+
+    // --- GSAP/ScrollTrigger Check ---
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined' || typeof ScrollToPlugin === 'undefined') {
-        console.error("GSAP or its plugins (ScrollTrigger, ScrollToPlugin) are not loaded!");
-        return;
+        console.error("GSAP or its plugins (ScrollTrigger, ScrollToPlugin) are not loaded! Animations and scroll effects will be disabled.");
+        // Optionally provide fallback behavior or just let it fail gracefully
+    } else {
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+        console.log("GSAP and plugins registered.");
+        // Initialize GSAP dependent features *only if GSAP is loaded*
+        initializeGsapFeatures();
     }
 
-    // Initialize GSAP and Plugins
-    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
-    // --- PRELOADER ---
+    // --- Preloader ---
     const loaderWrapper = document.querySelector('.loader-wrapper');
     if (loaderWrapper) {
-        // Use GSAP for fade out controlled by window load
-        gsap.to(loaderWrapper, {
-            opacity: 0,
-            duration: 0.8,
-            delay: 0.3, // Slight delay after content might be visible
-            ease: 'power1.out',
-            onComplete: () => {
-                loaderWrapper.style.display = 'none'; // Hide completely
-                document.body.classList.remove('loading'); // Remove loading class from body
-                document.body.classList.add('loaded');
-                // Trigger entry animations after load
-                animateHeroElements();
-                // Trigger general scroll animations setup after load
-                setupScrollAnimations();
-                 // Ensure initial states are correct after loading
-                setupSmoothScrolling(); // Re-check links after potential dynamic content
-            }
+        window.addEventListener('load', () => {
+            gsap.to(loaderWrapper, {
+                opacity: 0,
+                duration: 0.5, // Faster fade
+                ease: 'power1.out',
+                onComplete: () => {
+                    loaderWrapper.style.display = 'none'; // Hide completely
+                    body.classList.remove('loading');
+                    body.classList.add('loaded');
+                    console.log("Page loaded, loader hidden.");
+                    // Trigger entry animations only if GSAP loaded
+                    if (typeof gsap !== 'undefined') {
+                        animateHeroElements();
+                    }
+                }
+            });
         });
-         // Fallback if window.load doesn't fire quickly or correctly
+        // Fallback if load event is slow
         setTimeout(() => {
-            if (document.body.classList.contains('loading')) {
+            if (body.classList.contains('loading')) {
                 console.warn("Load event fallback triggered.");
-                 gsap.to(loaderWrapper, {opacity: 0, duration: 0.5, onComplete: () => loaderWrapper.style.display = 'none'});
-                document.body.classList.remove('loading');
-                document.body.classList.add('loaded');
-                animateHeroElements();
-                setupScrollAnimations();
-                 setupSmoothScrolling();
+                gsap.to(loaderWrapper, {opacity: 0, duration: 0.5, onComplete: () => loaderWrapper.style.display = 'none'});
+                body.classList.remove('loading');
+                body.classList.add('loaded');
+                if (typeof gsap !== 'undefined') {
+                    animateHeroElements();
+                }
             }
-        }, 3000); // Max wait 3 seconds
+        }, 3500); // Increased fallback timeout slightly
 
     } else {
-        // If no loader, trigger animations immediately
-         document.body.classList.remove('loading'); // Ensure class is removed
-         document.body.classList.add('loaded');
-        animateHeroElements();
-        setupScrollAnimations();
-        setupSmoothScrolling(); // Setup scrolling immediately
+        // If no loader, remove classes immediately
+        body.classList.remove('loading');
+        body.classList.add('loaded');
+        if (typeof gsap !== 'undefined') {
+            animateHeroElements(); // Still try hero animations
+        }
     }
 
-    // --- NAVIGATION ---
-    const nav = document.querySelector('nav');
-    let lastScrollTop = 0; // For hiding nav on scroll down
-    if (nav) {
-        ScrollTrigger.create({
-            start: 'top -70', // A bit past the top
-            end: 99999,
-            onUpdate: self => {
-                const currentScrollTop = self.scroll();
-                // Add scrolled class for background change
-                 if (currentScrollTop > 60) {
-                     nav.classList.add('scrolled');
-                 } else {
-                     nav.classList.remove('scrolled');
-                 }
+    // --- Sound Playback ---
+    const sound1 = document.getElementById('sound-click-1');
+    const sound2 = document.getElementById('sound-click-2');
+    const soundInteract = document.getElementById('sound-interact');
 
-                 // Hide/show nav on scroll direction change (optional)
-                 // Uncomment if you want the nav to hide on scroll down
-                 /*
-                 if (currentScrollTop > lastScrollTop && currentScrollTop > nav.offsetHeight * 2) {
-                     // Scrolling Down
-                     gsap.to(nav, { y: -nav.offsetHeight, duration: 0.3, ease: 'power1.out' });
-                 } else {
-                      // Scrolling Up or near top
-                     gsap.to(nav, { y: 0, duration: 0.3, ease: 'power1.out' });
-                 }
-                 lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop; // For Mobile or negative scrolling
-                 */
+    const playSound = (audioElement) => {
+        if (audioElement && audioElement.readyState >= 2) { // Check if audio is ready
+            audioElement.currentTime = 0;
+            audioElement.play().catch(error => console.log("Audio play prevented:", error));
+        } else if (audioElement) {
+            console.warn("Audio element not ready:", audioElement.id);
+        }
+    };
+
+    // --- Navigation & Button Click Sounds ---
+    // Add sound to specific buttons without preventing navigation
+    document.querySelectorAll('a.btn, .cta-buttons a, .footer-social a, .read-more').forEach(el => {
+        // Exclude buttons that might have other specific interactions handled elsewhere (like modal triggers)
+        if (!el.closest('.placeholder-video')) { // Example exclusion
+            el.addEventListener('click', (e) => {
+                // Determine which sound based on class or ID if needed
+                // For simplicity, using sound1 for most link clicks
+                playSound(sound1);
+                console.log(`Link/Button clicked: ${el.href || el.id || 'Unknown'}`);
+                // IMPORTANT: No preventDefault() here for standard links/buttons
+            });
+        }
+    });
+
+    // --- Hamburger Menu ---
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links'); // The container for mobile links
+    const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
+
+    if (hamburger && navLinks && mobileMenuOverlay) {
+        hamburger.addEventListener('click', () => {
+            playSound(sound1); // Sound on toggle
+            const isActive = hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active', isActive);
+            mobileMenuOverlay.classList.toggle('active', isActive);
+            // Toggle body scroll based on menu state
+            body.style.overflow = isActive ? 'hidden' : '';
+        });
+
+        mobileMenuOverlay.addEventListener('click', () => {
+            closeMobileMenu();
+        });
+
+        // *** FIX: Handle clicks on links *inside* the mobile menu ***
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                // Play sound if desired
+                 playSound(sound1);
+                // Only close the menu if it's currently active (mobile view)
+                if (hamburger.classList.contains('active')) {
+                     console.log('Closing mobile menu on link click:', link.href);
+                     closeMobileMenu();
+                     // *** DO NOT call e.preventDefault() ***
+                     // Let the browser handle the navigation to the link's href
+                }
+            });
+        });
+
+        function closeMobileMenu() {
+            hamburger.classList.remove('active');
+            navLinks.classList.remove('active');
+            mobileMenuOverlay.classList.remove('active');
+            body.style.overflow = ''; // Restore body scroll
+        }
+
+    } else {
+        console.warn("Hamburger menu elements not found.");
+    }
+
+
+    // --- Dynamic Copyright Year ---
+    const yearSpan = document.getElementById('copyright-year');
+    if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+    }
+
+    // --- Love Counter Logic ---
+    const loveButton = document.getElementById('love-it-button');
+    const loveCounterSpan = document.getElementById('love-counter');
+    if (loveButton && loveCounterSpan) {
+        const localStorageKey = 'seticaLoveCount';
+        const lovedStateKey = 'seticaLovedState';
+
+        let currentLoveCount = parseInt(localStorage.getItem(localStorageKey) || '0');
+        let userHasLoved = localStorage.getItem(lovedStateKey) === 'true';
+
+        const updateLoveDisplay = () => {
+            loveCounterSpan.textContent = currentLoveCount;
+            loveButton.classList.toggle('loved', userHasLoved);
+        };
+
+        updateLoveDisplay(); // Initial display
+
+        loveButton.addEventListener('click', () => {
+            playSound(sound2); // Different sound for love?
+            if (!userHasLoved) {
+                currentLoveCount++;
+                userHasLoved = true;
+                localStorage.setItem(localStorageKey, currentLoveCount);
+                localStorage.setItem(lovedStateKey, 'true');
+                updateLoveDisplay();
+
+                // Animation (requires GSAP)
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo(loveButton.querySelector('.heart-icon'),
+                        { scale: 1 },
+                        { scale: 1.4, duration: 0.3, ease: 'back.out(3)', yoyo: true, repeat: 1 }
+                    );
+                }
+            } else {
+                console.log("User has already loved this.");
+                // Optional shake effect (requires GSAP)
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo(loveButton, { x: 0 }, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+                }
             }
-            // Note: toggleClass might conflict with the hide/show logic if enabled
-            // toggleClass: { className: 'scrolled', targets: nav }
+        });
+    } else {
+         console.warn("Love counter elements not found.");
+    }
+
+    // --- Demo Video Modal Trigger ---
+    // The modal creation/closing logic is now within initializeGsapFeatures
+    // This just adds the listener to the trigger element
+    const placeholderVideo = document.querySelector('.placeholder-video');
+    if (placeholderVideo) {
+        placeholderVideo.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent any default link behavior
+            playSound(soundClick1); // Play click sound
+            // Check if the function exists (meaning GSAP loaded) before calling
+            if (typeof openVideoModal === 'function') {
+                openVideoModal();
+            } else {
+                alert('Video player requires JavaScript libraries to be loaded.');
+            }
         });
     }
 
-    // Add this to your existing script.js file or replace the current hamburger menu functionality
+    // --- Interactive Hold Element ---
+    const interactElement = document.getElementById('hold-interact-element');
+    if (interactElement) {
+        const pulseCircle = interactElement.querySelector('.pulse-circle');
+        let pulseTimeout;
+        let interactionStarted = false;
+
+        const startInteraction = (e) => {
+            e.preventDefault();
+            if (interactionStarted) return;
+            interactionStarted = true;
+            if (pulseCircle) pulseCircle.classList.add('active');
+            playSound(soundInteract); // Play hold sound immediately
+
+            clearTimeout(pulseTimeout);
+            pulseTimeout = setTimeout(() => {
+                console.log("Hold interaction complete!");
+                 if (typeof gsap !== 'undefined' && pulseCircle) {
+                     gsap.to(pulseCircle, { scale: 1.15, duration: 0.5, ease: 'elastic.out(1, 0.6)' });
+                 }
+            }, 700);
+        };
+
+        const endInteraction = () => {
+            clearTimeout(pulseTimeout);
+            if (interactionStarted) {
+                 if (pulseCircle) pulseCircle.classList.remove('active');
+                 if (typeof gsap !== 'undefined' && pulseCircle) {
+                    gsap.to(pulseCircle, { scale: 1, duration: 0.3, ease: 'power1.out' });
+                }
+                interactionStarted = false;
+            }
+        };
+
+        interactElement.addEventListener('mousedown', startInteraction);
+        interactElement.addEventListener('mouseup', endInteraction);
+        interactElement.addEventListener('mouseleave', endInteraction);
+        interactElement.addEventListener('touchstart', startInteraction, { passive: false });
+        interactElement.addEventListener('touchend', endInteraction);
+        interactElement.addEventListener('touchcancel', endInteraction);
+    }
 
 
+    // ========================================================================
+    // == GSAP-DEPENDENT FEATURES INITIALIZATION                           ==
+    // ========================================================================
+    function initializeGsapFeatures() {
+        console.log("Initializing GSAP-dependent features...");
 
-    // --- SMOOTH SCROLLING HELPER ---
-     let isScrolling = false; // Flag to prevent overlapping scroll animations
+        // --- Smooth Scrolling Setup ---
+        setupSmoothScrolling();
 
-    function scrollToTarget(targetId, callback = null) {
-        if (!targetId || targetId === '#' || isScrolling) return; // Prevent scroll if already scrolling
+        // --- Nav Scroll Behavior ---
+        setupNavScroll();
 
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) {
-             isScrolling = true; // Set flag
-             const navHeight = nav ? nav.offsetHeight : 70; // Get current nav height
-            // Calculate target Y position carefully
-            // Use ScrollTrigger's utility if available or calculate manually
-             let targetY;
-             try {
-                  targetY = ScrollTrigger.maxScroll(window) < targetElement.offsetTop + navHeight + 20 ?
-                      ScrollTrigger.maxScroll(window) :
-                      targetElement.offsetTop - navHeight - 20; // Adjust offset as needed
-             } catch(e) {
-                 targetY = targetElement.offsetTop - navHeight - 20; // Fallback calculation
-             }
+        // --- General Scroll Animations ---
+        setupScrollAnimations();
 
-             targetY = Math.max(0, targetY); // Ensure targetY is not negative
+        // --- Parallax Background ---
+        setupParallax();
+
+        // --- Particle Animation (Innovation Section) ---
+        setupParticleAnimation();
+
+        // --- Demo Video Modal ---
+        setupVideoModal(); // Define the functions needed for the modal
+
+        // --- Scroll Up Button ---
+         setupScrollUpButton();
+
+        // --- Solutions Carousel (If you add it back) ---
+        // setupSolutionsCarousel();
+    }
+
+
+    // ========================================================================
+    // == GSAP Helper Functions (called from initializeGsapFeatures)       ==
+    // ========================================================================
+
+    function setupSmoothScrolling() {
+        const nav = document.querySelector('nav');
+        let isScrolling = false;
+
+        function scrollToTarget(target, offset = 0) {
+            let targetElement;
+            if (typeof target === 'number') {
+                targetElement = target; // Direct scroll position
+            } else if (typeof target === 'string') {
+                targetElement = document.querySelector(target);
+            } else {
+                targetElement = target; // Assume it's already an element
+            }
+
+            if (targetElement === null || targetElement === undefined || isScrolling) return;
+
+            isScrolling = true;
+            let targetY;
+
+            if (typeof targetElement === 'number') {
+                 targetY = targetElement;
+            } else {
+                const navHeight = nav ? nav.offsetHeight : 70;
+                const elementTop = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                targetY = elementTop - navHeight - 20 + offset; // Standard offset
+            }
+
+            targetY = Math.max(0, targetY); // Ensure not negative
+            targetY = Math.min(targetY, ScrollTrigger.maxScroll(window)); // Ensure not past max scroll
 
 
             gsap.to(window, {
-                duration: 1.2, // Adjust duration
-                scrollTo: {
-                    y: targetY, // Use calculated offset
-                    autoKill: true // Kill existing scrolls to this target
-                },
-                ease: 'power3.inOut', // Smoother ease
-                onComplete: () => {
-                     isScrolling = false; // Reset flag
-                    if (callback && typeof callback === 'function') {
-                        callback();
-                    }
-                 },
-                 onInterrupt: () => { // Handle scroll interruption by user
-                     isScrolling = false;
-                 }
+                scrollTo: { y: targetY, autoKill: true },
+                duration: 1.2,
+                ease: 'power2.inOut',
+                onComplete: () => isScrolling = false,
+                onInterrupt: () => isScrolling = false
             });
-        } else {
-            console.warn('Scroll target not found:', targetId);
-             isScrolling = false; // Reset flag even if target not found
-            if (callback && typeof callback === 'function') {
-                 callback();
-            }
         }
-    }
 
-    // --- SETUP SMOOTH SCROLL EVENT LISTENERS ---
-    function setupSmoothScrolling() {
-         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            // Ensure it's not a mobile menu link (handled separately)
-             if (!anchor.closest('.mobile-menu')) {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    scrollToTarget(targetId);
+        // Attach listeners to anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            if (anchor.getAttribute('href') !== '#') { // Avoid empty hash links
+                anchor.addEventListener('click', function(e) {
+                    // Don't prevent default if it's inside the mobile menu (handled there)
+                    if (!anchor.closest('.nav-links.active')) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href');
+                        scrollToTarget(targetId);
+                         // Close mobile menu if open (safety check)
+                         if (hamburger && hamburger.classList.contains('active')) {
+                            closeMobileMenu();
+                         }
+                    }
                 });
             }
         });
-         // Handle scroll indicator click
+
+        // Scroll indicator click
         const scrollIndicator = document.querySelector('.scroll-indicator');
         if (scrollIndicator) {
             scrollIndicator.addEventListener('click', () => {
-                 // Target the first actual section after the header
-                const firstSection = document.querySelector('header + section');
-                if (firstSection && firstSection.id) {
-                    scrollToTarget(`#${firstSection.id}`);
+                const firstSection = document.querySelector('header.hero + section');
+                if (firstSection) {
+                    scrollToTarget(firstSection);
                 } else {
-                     console.warn("Could not find the first section after the header to scroll to.");
-                     scrollToTarget(0); // Scroll to top as fallback
+                    scrollToTarget(window.innerHeight * 0.8); // Scroll down a bit
                 }
             });
         }
+
+        // Expose scrollToTarget globally if needed (e.g., for onclick attributes, though not recommended)
+        // window.scrollToTarget = scrollToTarget;
     }
-    // setupSmoothScrolling() is called after loader logic finishes.
 
+    function setupNavScroll() {
+        const nav = document.querySelector('nav');
+        if (!nav) return;
+        ScrollTrigger.create({
+            start: 'top -70',
+            end: 99999,
+            toggleClass: { className: 'scrolled', targets: nav }
+            // Add onUpdate for hide/show logic if desired
+        });
+    }
 
-    // --- HERO ANIMATION ---
+    function setupScrollAnimations() {
+        // Fade/slide in sections and elements
+        gsap.utils.toArray('.section-header, .content-left, .content-right, .solution-card-large, .feature, .video-container, footer > .footer-container > div, .solutions-grid, .view-more-section, #demo .section-wrapper.single-column > h2').forEach(el => {
+            gsap.from(el, {
+                opacity: 0.1,
+                y: 50,
+                duration: 0.8,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: el,
+                    start: 'top 88%', // Trigger when 88% from top enters viewport
+                    toggleActions: 'play none none none', // Play once
+                    // markers: true, // For debugging
+                    // once: true // More performant if animation only runs once
+                }
+            });
+        });
+
+         // Stagger children of specific containers if needed
+         gsap.utils.toArray('.features, .solutions-grid').forEach(container => {
+             if(container.children.length > 0) {
+                 gsap.from(container.children, {
+                     opacity: 0,
+                     y: 40,
+                     duration: 0.6,
+                     ease: 'power2.out',
+                     stagger: 0.1,
+                     scrollTrigger: {
+                         trigger: container,
+                         start: 'top 85%',
+                         toggleActions: 'play none none none',
+                         // once: true
+                     }
+                 });
+             }
+         });
+    }
+
     function animateHeroElements() {
-        const heroHeading = document.querySelector('.hero h1');
-        const heroParagraph = document.querySelector('.hero p');
-        const heroButtons = document.querySelectorAll('.hero .cta-buttons a');
-        const scrollIndicator = document.querySelector('.scroll-indicator');
+         const heroHeading = document.querySelector('.hero h1.animate-text');
+         const heroParagraph = document.querySelector('.hero p.animate-text-delay');
+         const heroButtons = document.querySelectorAll('.hero .cta-buttons a'); // If you add buttons back
+         const scrollIndicator = document.querySelector('.scroll-indicator');
 
-        const tl = gsap.timeline({ delay: 0.2 }); // Reduce delay slightly
+         const tl = gsap.timeline({ delay: 0.3 }); // Start slightly after load
 
-        if (heroHeading) tl.from(heroHeading, { opacity: 0, y: 50, duration: 1, ease: 'power3.out' });
-        if (heroParagraph) tl.from(heroParagraph, { opacity: 0, y: 40, duration: 1, ease: 'power3.out' }, "-=0.8");
-        if (heroButtons.length > 0) tl.from(heroButtons, { opacity: 0, y: 40, duration: 0.8, stagger: 0.2, ease: 'power3.out' }, "-=0.7");
-        if (scrollIndicator) tl.from(scrollIndicator, { opacity: 0, y: 30, duration: 0.8, ease: 'power2.out'}, "-=0.6");
+         if (heroHeading) tl.from(heroHeading, { opacity: 0, y: 50, duration: 1, ease: 'power3.out' });
+         if (heroParagraph) tl.from(heroParagraph, { opacity: 0, y: 40, duration: 1, ease: 'power3.out' }, "-=0.8");
+         if (heroButtons.length > 0) tl.from(heroButtons, { opacity: 0, y: 30, duration: 0.8, stagger: 0.15, ease: 'back.out(1.7)' }, "-=0.7");
+         if (scrollIndicator) tl.from(scrollIndicator, { opacity: 0, y: 20, duration: 0.8, ease: 'power2.out'}, "-=0.6");
+     }
+
+    function setupParallax() {
+        gsap.utils.toArray('.hero, .cosmic-section').forEach(section => {
+            const stars = section.querySelector('.stars');
+            const twinkling = section.querySelector('.twinkling');
+
+            if (stars) {
+                gsap.to(stars, {
+                    backgroundPosition: "50% 150%",
+                    ease: "none",
+                    scrollTrigger: { trigger: section, start: "top bottom", end: "bottom top", scrub: 2 }
+                });
+            }
+            if (twinkling) {
+                gsap.to(twinkling, {
+                    backgroundPosition: "50% 100%",
+                    ease: "none",
+                    scrollTrigger: { trigger: section, start: "top bottom", end: "bottom top", scrub: 3 }
+                });
+            }
+        });
     }
 
-    // --- EXPLOSION/PARTICLE ANIMATION (Innovation Section) ---
-     const explosionAnimationContainer = document.querySelector('.explosion-animation');
+    function setupParticleAnimation() {
+        const container = document.querySelector('#innovation .content-right');
+        if (!container) return;
 
-     if (explosionAnimationContainer) {
-        let particleAnimationId;
         const canvas = document.createElement('canvas');
-        explosionAnimationContainer.innerHTML = ''; // Clear placeholder
-        explosionAnimationContainer.appendChild(canvas);
+        container.innerHTML = ''; // Clear placeholder
+        container.appendChild(canvas);
         const ctx = canvas.getContext('2d');
         let particles = [];
         let animationActive = false;
-        let mouse = { x: null, y: null, radius: 100 }; // Increased radius
+        let animationFrameId;
+        let mouse = { x: null, y: null, radius: 100 };
 
         function resizeCanvas() {
-            canvas.width = explosionAnimationContainer.clientWidth;
-            canvas.height = explosionAnimationContainer.clientHeight;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
         }
 
         class Particle {
-            constructor(x, y) {
+             constructor(x, y) {
                 this.x = x || Math.random() * canvas.width;
                 this.y = y || Math.random() * canvas.height;
-                this.size = Math.random() * 5 + 2;
+                this.size = Math.random() * 4 + 1.5; // Slightly smaller range
                 this.baseX = this.x;
                 this.baseY = this.y;
-                this.density = (Math.random() * 40) + 5; // Wider range
-                this.color = `hsl(${Math.random() * 60 + 200}, 100%, ${Math.random() * 40 + 50}%)`; // Cooler tones (Blues/Purples)
-                this.opacity = Math.random() * 0.5 + 0.3; // Start partially transparent
-                this.maxOpacity = this.opacity;
-                this.velocity = { x: (Math.random() - 0.5) * 1, y: (Math.random() - 0.5) * 1 };
+                this.density = (Math.random() * 30) + 5; // Adjusted density
+                // Cooler color theme (blues, purples, teals)
+                this.color = `hsl(${Math.random() * 80 + 180}, 90%, ${Math.random() * 30 + 55}%)`;
+                this.opacity = Math.random() * 0.4 + 0.2;
+                this.maxOpacity = this.opacity + 0.3; // Can get brighter near mouse
+                this.velocity = { x: (Math.random() - 0.5) * 0.5, y: (Math.random() - 0.5) * 0.5 }; // Slower drift
             }
             update() {
                 let dx = mouse.x - this.x;
@@ -224,30 +477,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 let maxDistance = mouse.radius;
                 let force = (maxDistance - distance) / maxDistance;
                 if (force < 0) force = 0;
+                let pushStrength = force * this.density * 0.05; // Softer push
 
-                if (distance < mouse.radius) {
-                     let pushStrength = force * this.density * 0.1; // Adjusted push strength
-                     this.x -= forceDirectionX * pushStrength;
-                     this.y -= forceDirectionY * pushStrength;
-                    this.opacity = this.maxOpacity; // Become fully visible near mouse
-                 } else {
-                     // Return to base
-                     if (this.x !== this.baseX) this.x -= (this.x - this.baseX) / 20;
-                     if (this.y !== this.baseY) this.y -= (this.y - this.baseY) / 20;
-                     // Fade slightly when away from mouse
-                     this.opacity = Math.max(this.maxOpacity * 0.5, this.opacity - 0.01);
-                 }
-                 // Gentle drift
-                 this.x += this.velocity.x;
-                 this.y += this.velocity.y;
+                if (distance < mouse.radius && mouse.x !== null) {
+                    this.x -= forceDirectionX * pushStrength;
+                    this.y -= forceDirectionY * pushStrength;
+                    this.opacity = Math.min(this.maxOpacity, this.opacity + 0.05); // Fade in
+                } else {
+                    // Return to base softly
+                    if (this.x !== this.baseX) this.x -= (this.x - this.baseX) / 30;
+                    if (this.y !== this.baseY) this.y -= (this.y - this.baseY) / 30;
+                    // Fade out slightly
+                    this.opacity = Math.max(this.maxOpacity * 0.4, this.opacity - 0.005);
+                }
+                // Drift
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
 
-                 // Keep within bounds slightly more aggressively
-                 if (this.x < 0 || this.x > canvas.width) this.velocity.x *= -0.9;
-                 if (this.y < 0 || this.y > canvas.height) this.velocity.y *= -0.9;
+                // Boundary check (wrap around for smoother effect?)
+                if (this.x < -this.size) this.x = canvas.width + this.size;
+                else if (this.x > canvas.width + this.size) this.x = -this.size;
+                if (this.y < -this.size) this.y = canvas.height + this.size;
+                else if (this.y > canvas.height + this.size) this.y = -this.size;
             }
             draw() {
                 ctx.fillStyle = this.color;
-                ctx.globalAlpha = Math.max(0, this.opacity); // Clamp opacity
+                ctx.globalAlpha = Math.max(0, this.opacity);
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.closePath();
@@ -255,441 +510,178 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+
         function initParticles(num) {
             particles = [];
-            const count = num || Math.min(400, Math.floor(canvas.width * canvas.height / 600));
+            resizeCanvas(); // Ensure canvas size is current
+            const count = num || Math.min(300, Math.floor(canvas.width * canvas.height / 800)); // Adjust density
             for (let i = 0; i < count; i++) {
                 particles.push(new Particle());
             }
+             console.log(`Initialized ${particles.length} particles.`);
         }
 
         function animateParticles() {
             if (!animationActive) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-             ctx.globalAlpha = 1; // Reset alpha for drawing
-            particles.forEach(particle => {
-                particle.update();
-                particle.draw();
-            });
-            particleAnimationId = requestAnimationFrame(animateParticles);
+             ctx.globalAlpha = 1; // Reset alpha
+            particles.forEach(p => { p.update(); p.draw(); });
+            animationFrameId = requestAnimationFrame(animateParticles);
         }
 
-        canvas.addEventListener('mousemove', function(event){
+        function handleMouseMove(event) {
             const rect = canvas.getBoundingClientRect();
             mouse.x = event.clientX - rect.left;
             mouse.y = event.clientY - rect.top;
-        });
-        canvas.addEventListener('mouseleave', function() { mouse.x = null; mouse.y = null; });
-         // Add touch support
-         canvas.addEventListener('touchmove', function(event) {
-            if (event.touches.length > 0) {
+        }
+        function handleMouseLeave() { mouse.x = null; mouse.y = null; }
+        function handleTouchMove(event) {
+             if (event.touches.length > 0) {
                 const rect = canvas.getBoundingClientRect();
                 mouse.x = event.touches[0].clientX - rect.left;
                 mouse.y = event.touches[0].clientY - rect.top;
              }
-         }, { passive: true });
-         canvas.addEventListener('touchend', function() { mouse.x = null; mouse.y = null; });
+        }
 
-        // Use Intersection Observer for better performance control
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseleave', handleMouseLeave);
+        canvas.addEventListener('touchmove', handleTouchMove, { passive: true });
+        canvas.addEventListener('touchend', handleMouseLeave);
+        canvas.addEventListener('touchcancel', handleMouseLeave);
+
+
+        // Observer to start/stop animation
         const observer = new IntersectionObserver((entries) => {
-             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                     if (!animationActive) {
-                         console.log("Starting particle animation");
-                         animationActive = true;
-                         resizeCanvas(); // Ensure size is correct
-                         initParticles(); // Re-initialize or adjust as needed
-                         animateParticles();
-                     }
-                 } else {
-                     if (animationActive) {
-                         console.log("Stopping particle animation");
-                         animationActive = false;
-                         cancelAnimationFrame(particleAnimationId);
-                     }
-                 }
-             });
-        }, { threshold: 0.1 }); // Trigger when 10% is visible
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !animationActive) {
+                    console.log("Starting particle animation");
+                    animationActive = true;
+                    initParticles(); // Initialize on first view or resize
+                    animateParticles();
+                } else if (!entry.isIntersecting && animationActive) {
+                    console.log("Stopping particle animation");
+                    animationActive = false;
+                    cancelAnimationFrame(animationFrameId);
+                }
+            });
+        }, { threshold: 0.05 }); // Trigger when 5% is visible
 
-        observer.observe(explosionAnimationContainer);
+        observer.observe(container);
+
+        // Handle resize
+        let resizeTimer;
         window.addEventListener('resize', () => {
-             if (animationActive) { // Only resize/reinit if currently active
-                 resizeCanvas();
-                 initParticles();
-             }
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (animationActive) { // Only re-init if currently visible/active
+                    console.log("Resizing particle canvas");
+                    // Cancel existing animation before re-init to avoid issues
+                    cancelAnimationFrame(animationFrameId);
+                    initParticles();
+                    animateParticles(); // Restart animation loop
+                } else {
+                    // If not active, just update dimensions for next time it becomes active
+                    resizeCanvas();
+                }
+            }, 250); // Debounce resize
         });
-
-     } // End particle animation setup
-
-    // --- METRICS COUNTER (REMOVED) ---
-    // Code related to .metric-number and its ScrollTrigger can be deleted.
-
-    // --- PULSE INTERACTION (Digital Frontiers) ---
-    const pulseCircle = document.querySelector('.pulse-circle');
-    if (pulseCircle) {
-        let pulseTimeout;
-        let interactionStarted = false;
-
-        const startInteraction = (e) => {
-            e.preventDefault(); // Prevent default behavior (like text selection or dragging)
-            if (interactionStarted) return;
-            interactionStarted = true;
-            pulseCircle.classList.add('active'); // Visual feedback: darker bg maybe
-             // Optional: Stop the CSS pulse animation
-             // pulseCircle.style.animationPlayState = 'paused';
-            clearTimeout(pulseTimeout); // Clear any existing timeout
-            pulseTimeout = setTimeout(() => {
-                 console.log("Hold interaction action!");
-                 // Trigger the sound from the inline script or here
-                 // playSound(soundInteract); // If you move sound logic here
-                 gsap.to(pulseCircle, { scale: 1.15, duration: 0.5, ease: 'elastic.out(1, 0.6)' });
-             }, 700); // Hold duration
-        };
-
-        const endInteraction = () => {
-            clearTimeout(pulseTimeout);
-            if (interactionStarted) {
-                 pulseCircle.classList.remove('active');
-                 // Optional: Resume the CSS pulse animation
-                 // pulseCircle.style.animationPlayState = 'running';
-                 gsap.to(pulseCircle, { scale: 1, duration: 0.3, ease: 'power1.out' });
-                 interactionStarted = false;
-            }
-        };
-
-        // Add event listeners
-        pulseCircle.addEventListener('mousedown', startInteraction);
-        pulseCircle.addEventListener('mouseup', endInteraction);
-        pulseCircle.addEventListener('mouseleave', endInteraction);
-        pulseCircle.addEventListener('touchstart', startInteraction, { passive: false }); // Need false to preventDefault
-        pulseCircle.addEventListener('touchend', endInteraction);
-        pulseCircle.addEventListener('touchcancel', endInteraction);
     }
 
+    // --- Video Modal Functions (Defined within initializeGsapFeatures) ---
+    let videoModal = null;
+    let videoIframe = null;
 
-    // --- SOLUTIONS CAROUSEL ---
-    const carouselContainer = document.querySelector('.carousel-container');
-    const carouselTrack = document.querySelector('.carousel-track');
+    function setupVideoModal() {
+        // Define open/close functions here, making them accessible to the event listener added earlier
+        window.openVideoModal = () => { // Assign to window to make it accessible globally from the listener
+            if (videoModal) return;
 
-     if (carouselContainer && carouselTrack && carouselTrack.children.length > 0) { // Check children exist
-         const carouselItems = Array.from(carouselTrack.children);
-         const prevBtn = document.querySelector('.prev-btn');
-         const nextBtn = document.querySelector('.next-btn');
+            const youtubeVideoId = 'dQw4w9WgXcQ'; // Placeholder - CHANGE THIS
+            if (!youtubeVideoId) { alert('Video ID not configured.'); return; }
 
-         let itemWidth = 0;
-         let currentIndex = 0;
-         let visibleItems = 3;
-         let totalItems = carouselItems.length;
-         let maxIndex = 0; // Will be calculated
-         let isDragging = false;
-         let startPosX = 0;
-         let currentTranslate = 0;
-         let prevTranslate = 0;
-         let animationID;
-         const dragThreshold = 30; // Minimum pixels to drag to change slide
+            videoModal = document.createElement('div');
+            videoModal.className = 'video-modal';
+            videoModal.innerHTML = `
+                <div class="video-modal-content">
+                    <div class="video-loading" style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; background: #111; color: #fff; font-size: 1rem; z-index: 1;">Loading...</div>
+                    <iframe style="opacity: 0; transition: opacity 0.5s ease 0.2s;" src="https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&rel=0&showinfo=0&enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+                <div class="close-video-modal" title="Close Video">×</div>`;
+            document.body.appendChild(videoModal);
+            document.body.style.overflow = 'hidden'; // Prevent background scroll
 
-         function calculateDimensions() {
-             if (!carouselItems[0]) return 0; // Safety check
-            const style = window.getComputedStyle(carouselItems[0]);
-             const itemMargin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-            itemWidth = carouselItems[0].offsetWidth + itemMargin; // Include margins
-            const containerWidth = carouselContainer.offsetWidth;
+            videoIframe = videoModal.querySelector('iframe');
+            const loadingIndicator = videoModal.querySelector('.video-loading');
+            const closeBtn = videoModal.querySelector('.close-video-modal');
 
-             // Adjust visible items based on viewport
-             if (window.innerWidth < 600) visibleItems = 1;
-             else if (window.innerWidth < 992) visibleItems = 2;
-             else visibleItems = Math.max(1, Math.floor(containerWidth / itemWidth) || 3); // Ensure at least 1
+            videoIframe.onload = () => {
+                if(loadingIndicator) loadingIndicator.style.display = 'none';
+                videoIframe.style.opacity = '1';
+            };
 
-            maxIndex = Math.max(0, totalItems - visibleItems);
-            return itemWidth; // Return it for immediate use
-         }
+            gsap.fromTo(videoModal, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power1.inOut', onStart: () => videoModal.classList.add('active') });
+            gsap.fromTo(videoModal.querySelector('.video-modal-content'),
+                { scale: 0.7, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.4, delay: 0.1, ease: 'back.out(1.7)' }
+            );
 
-        function setPositionByIndex(animate = true) {
-            if (itemWidth === 0) return; // Don't position if width not calculated
-            currentIndex = Math.max(0, Math.min(currentIndex, maxIndex)); // Clamp index
-            currentTranslate = -currentIndex * itemWidth;
-            prevTranslate = currentTranslate;
-            carouselTrack.style.transition = animate && !isDragging ? 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)' : 'none';
-            carouselTrack.style.transform = `translateX(${currentTranslate}px)`;
-            updateNavButtons();
+            closeBtn.addEventListener('click', closeVideoModal);
+            videoModal.addEventListener('click', (e) => { if (e.target === videoModal) closeVideoModal(); });
+            document.addEventListener('keydown', handleEscKey);
+        };
+
+        window.closeVideoModal = () => { // Assign to window
+            if (!videoModal) return;
+            document.removeEventListener('keydown', handleEscKey);
+            gsap.to(videoModal, {
+                opacity: 0, duration: 0.3, ease: 'power1.inOut',
+                onComplete: () => {
+                    if (videoIframe && videoIframe.contentWindow) {
+                        try { // Wrap in try/catch in case iframe is weird
+                             videoIframe.contentWindow.postMessage('{"event":"command","func":"stopVideo","args":""}', '*');
+                        } catch (err) { console.error("Error stopping video:", err); }
+                    }
+                    if(videoModal.parentNode) videoModal.remove();
+                    videoModal = null;
+                    videoIframe = null;
+                    document.body.style.overflow = ''; // Restore scroll
+                }
+            });
+        };
+
+        function handleEscKey(event) {
+            if (event.key === 'Escape' || event.key === 'Esc') {
+                closeVideoModal();
+            }
         }
+    } // End setupVideoModal
 
-         function updateNavButtons() {
-             if (!prevBtn || !nextBtn) return;
-             prevBtn.disabled = currentIndex <= 0;
-             nextBtn.disabled = currentIndex >= maxIndex;
-             gsap.to([prevBtn, nextBtn], { // Animate opacity for smoother feel
-                 opacity: (btn) => btn.disabled ? 0.4 : 1,
-                 cursor: (btn) => btn.disabled ? 'not-allowed' : 'pointer',
-                 duration: 0.2
-             });
-         }
+     function setupScrollUpButton() {
+        const scrollUpButton = document.createElement('div');
+        scrollUpButton.className = 'scroll-up'; // Add a class for styling
+        scrollUpButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        document.body.appendChild(scrollUpButton);
 
-        function dragStart(e) {
-             if (isScrolling) return; // Prevent drag during page scroll
-            isDragging = true;
-            startPosX = getPositionX(e);
-             animationID = requestAnimationFrame(animationLoop); // Not strictly needed if only updating on move
-             carouselTrack.style.transition = 'none';
-             carouselContainer.style.cursor = 'grabbing';
-        }
-
-        function dragging(e) {
-            if (!isDragging) return;
-            const currentPosition = getPositionX(e);
-            currentTranslate = prevTranslate + currentPosition - startPosX;
-            // Limit dragging past boundaries visually (optional)
-             // const minTranslate = -maxIndex * itemWidth;
-             // currentTranslate = Math.max(minTranslate - itemWidth/2, Math.min(itemWidth/2, currentTranslate)); // Allow slight overdrag
-            carouselTrack.style.transform = `translateX(${currentTranslate}px)`; // Update visual position immediately
-        }
-
-        function dragEnd() {
-            if (!isDragging) return;
-            isDragging = false;
-             cancelAnimationFrame(animationID); // Not critical here
-             carouselContainer.style.cursor = 'grab';
-
-            const movedBy = currentTranslate - prevTranslate;
-
-             // Snap based on drag distance only if moved significantly
-             if (Math.abs(movedBy) > dragThreshold) {
-                 if (movedBy < 0 && currentIndex < maxIndex) currentIndex++;
-                 else if (movedBy > 0 && currentIndex > 0) currentIndex--;
-             }
-             // Always snap back to the determined index
-             setPositionByIndex();
-        }
-
-        function getPositionX(e) {
-            return e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-        }
-         function animationLoop(){ /* Currently empty, kept for potential future use */ }
-
-         // Event Listeners for Drag
-        carouselContainer.addEventListener('mousedown', dragStart);
-        carouselContainer.addEventListener('touchstart', dragStart, { passive: true });
-        document.addEventListener('mousemove', dragging); // Listen on document to drag outside container
-        document.addEventListener('touchmove', dragging, { passive: true });
-        document.addEventListener('mouseup', dragEnd); // Listen on document
-        document.addEventListener('touchend', dragEnd);
-        document.addEventListener('touchcancel', dragEnd);
-
-         // Button Listeners
-         if(nextBtn) nextBtn.addEventListener('click', () => { if (currentIndex < maxIndex) currentIndex++; setPositionByIndex(); });
-         if(prevBtn) prevBtn.addEventListener('click', () => { if (currentIndex > 0) currentIndex--; setPositionByIndex(); });
-
-        // Initial Setup & Resize Handling
-        let resizeTimeout;
-        function onResize() {
-             clearTimeout(resizeTimeout);
-             resizeTimeout = setTimeout(() => {
-                itemWidth = calculateDimensions(); // Recalculate width
-                setPositionByIndex(false); // Update position without animation
-                 console.log("Carousel resized. New itemWidth:", itemWidth, "Max Index:", maxIndex);
-             }, 200); // Debounce resize event
-        }
-
-        window.addEventListener('resize', onResize);
-        itemWidth = calculateDimensions(); // Initial calculation
-         setTimeout(() => { // Initial position after slight delay for layout stability
-             itemWidth = calculateDimensions(); // Recalculate just in case
-             setPositionByIndex(false);
-         }, 150);
-
-     } else {
-          console.warn("Carousel elements missing or empty.");
-     } // End carousel logic
-
-
-    // --- DEMO VIDEO MODAL ---
-     const placeholderVideo = document.querySelector('.placeholder-video');
-     let videoModal = null; // Use let, initialize to null
-     let videoIframe = null;
-
-     function openVideoModal() {
-         if (videoModal) return; // Prevent opening multiple modals
-
-         // *** Replace with your ACTUAL YouTube video ID ***
-         const youtubeVideoId = 'dQw4w9WgXcQ'; // Example placeholder ID
-         if (!youtubeVideoId) {
-             alert('Video ID not set.');
-             return;
-         }
-
-         videoModal = document.createElement('div'); // Create the element now
-         videoModal.className = 'video-modal';
-         videoModal.innerHTML = `
-             <div class="video-modal-content">
-                  <!-- Added loading state -->
-                  <div class="video-loading" style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; background: #000; color: #fff; font-size: 1rem;">Loading Video...</div>
-                  <iframe style="opacity: 0; transition: opacity 0.5s ease 0.3s;" src="https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&rel=0&showinfo=0&enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-             </div>
-             <div class="close-video-modal" title="Close Video">×</div>
-         `;
-         document.body.appendChild(videoModal);
-         videoIframe = videoModal.querySelector('iframe');
-          const loadingIndicator = videoModal.querySelector('.video-loading');
-
-          // Show iframe when loaded
-          videoIframe.onload = () => {
-              loadingIndicator.style.display = 'none';
-              videoIframe.style.opacity = '1';
-          };
-
-
-          // Stop potential background scroll
-          document.body.style.overflow = 'hidden';
-
-         // Use GSAP for animations
-         gsap.fromTo(videoModal, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power1.inOut', onStart: () => videoModal.classList.add('active') });
-         gsap.fromTo(videoModal.querySelector('.video-modal-content'),
-              { scale: 0.7, opacity: 0 },
-              { scale: 1, opacity: 1, duration: 0.4, delay: 0.1, ease: 'back.out(1.5)' }
-         );
-
-         // Add close listeners AFTER modal is created
-         videoModal.querySelector('.close-video-modal').addEventListener('click', closeVideoModal);
-         videoModal.addEventListener('click', (e) => { // Close on overlay click
-             if (e.target === videoModal) {
-                 closeVideoModal();
-             }
-         });
-         document.addEventListener('keydown', handleEscKey); // Use named function
-     }
-
-     function closeVideoModal() {
-         if (!videoModal) return; // Prevent closing if already closed
-
-         document.removeEventListener('keydown', handleEscKey); // Clean up listener
-         gsap.to(videoModal, {
-             opacity: 0,
-             duration: 0.3,
-             ease: 'power1.inOut',
-             onComplete: () => {
-                 // Stop video playback by removing the iframe OR clearing src
-                 if (videoIframe && videoIframe.contentWindow) {
-                      // Send postMessage to YouTube API to stop video if loaded
-                       videoIframe.contentWindow.postMessage('{"event":"command","func":"' + 'stopVideo' + '","args":""}', '*');
-                  }
-                 if (videoModal.parentNode) {
-                     videoModal.remove(); // Remove modal from DOM
-                 }
-                 videoModal = null; // Reset variable
-                 videoIframe = null;
-                 document.body.style.overflow = ''; // Restore scrolling
-             }
-         });
-     }
-
-     // Separate ESC key handler function
-     function handleEscKey(event) {
-         if (event.key === 'Escape' || event.key === 'Esc') { // Check both key values
-             closeVideoModal();
-         }
-     }
-
-     if (placeholderVideo) {
-         placeholderVideo.addEventListener('click', (e) => {
-             e.preventDefault(); // Prevent potential default behavior
-             openVideoModal();
-         });
-     } else {
-         console.warn("Placeholder video element not found.");
-     }
-
-    // --- SCROLL UP BUTTON ---
-    const scrollUpButton = document.querySelector('.scroll-up');
-    if (scrollUpButton) {
-         // Initial state hidden
-         gsap.set(scrollUpButton, { bottom: -60, opacity: 0, scale: 0.8 });
+        gsap.set(scrollUpButton, { bottom: -60, opacity: 0, scale: 0.8 }); // Initial hidden state
 
         ScrollTrigger.create({
-             trigger: 'body', // Monitor whole body scroll
-             start: "top -400", // Show after scrolling down 400px
-             end: 99999,
-             toggleClass: { targets: scrollUpButton, className: "active" }, // Simple toggle class
-             onEnter: () => gsap.to(scrollUpButton, { bottom: 30, opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(1.7)'}),
-             onLeaveBack: () => gsap.to(scrollUpButton, { bottom: -60, opacity: 0, scale: 0.8, duration: 0.3, ease: 'power1.in'})
+            trigger: 'body',
+            start: "top -400", // Show after scrolling 400px
+            end: 99999,
+            onEnter: () => gsap.to(scrollUpButton, { bottom: 30, opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(1.7)' }),
+            onLeaveBack: () => gsap.to(scrollUpButton, { bottom: -60, opacity: 0, scale: 0.8, duration: 0.3, ease: 'power1.in' })
         });
 
         scrollUpButton.addEventListener('click', () => {
-            scrollToTarget(0); // Use the helper function
+             if (typeof gsap !== 'undefined') {
+                 gsap.to(window, { scrollTo: 0, duration: 1, ease: 'power2.inOut' });
+             } else {
+                 window.scrollTo({ top: 0, behavior: 'smooth' }); // Fallback
+             }
         });
     }
 
-    // --- GENERAL SCROLL-TRIGGERED ANIMATIONS ---
-    function setupScrollAnimations() {
-         // Animate elements fading/sliding in on scroll
-         gsap.utils.toArray('.section-header, .content-left, .content-right, .solution-card, .feature, .pricing-card, .video-container, footer > .footer-container > *').forEach((el, index) => {
-             gsap.from(el, {
-                 opacity: 0.1, // Start slightly visible for perceived performance
-                 y: 60,
-                 duration: 0.8,
-                 ease: 'power2.out',
-                 // delay: index * 0.05, // Subtle stagger within sections
-                 scrollTrigger: {
-                     trigger: el,
-                     start: 'top 88%', // Adjust trigger point
-                     end: 'bottom 20%',
-                     toggleActions: 'play none none none', // Play once on enter
-                     // markers: true, // Uncomment for debugging
-                     // once: true, // Consider using 'once' for performance
-                 }
-             });
-         });
+    // --- End of DOMContentLoaded ---
+    console.log("Setica base scripts initialized.");
 
-          // Staggered animation specifically for grids like solutions carousel items (apply to container)
-          gsap.utils.toArray('.solutions-carousel .carousel-track, .features').forEach(container => {
-             gsap.from(container.children, {
-                 opacity: 0,
-                 y: 50,
-                 duration: 0.6,
-                 ease: 'power2.out',
-                 stagger: 0.1, // Stagger the animation of direct children
-                 scrollTrigger: {
-                     trigger: container,
-                     start: 'top 85%',
-                     toggleActions: 'play none none none',
-                 }
-             });
-         });
-
-    }
-    // setupScrollAnimations() is called after loader/immediately.
-
-    // --- PARALLAX BACKGROUND EFFECT ---
-     gsap.utils.toArray('.hero, .cosmic-section').forEach(section => {
-         const stars = section.querySelector('.stars');
-         const twinkling = section.querySelector('.twinkling');
-
-         if (stars) {
-            gsap.to(stars, {
-                 backgroundPosition: "50% 150%", // Enhanced effect
-                 ease: "none",
-                 scrollTrigger: {
-                     trigger: section,
-                     start: "top bottom",
-                     end: "bottom top",
-                     scrub: 2 // Adjust scrub speed
-                 },
-             });
-         }
-         if (twinkling) {
-             gsap.to(twinkling, {
-                 backgroundPosition: "50% 100%", // Subtle parallax
-                 ease: "none",
-                 scrollTrigger: {
-                     trigger: section,
-                     start: "top bottom",
-                     end: "bottom top",
-                     scrub: 3
-                 },
-             });
-         }
-    });
-
-
-    // --- END OF DOMContentLoaded ---
-    console.log("Setica page scripts initialized.");
-});
+}); // End DOMContentLoaded wrapper
