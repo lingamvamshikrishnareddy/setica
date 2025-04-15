@@ -1,0 +1,51 @@
+<!-- robots.txt -->
+User-agent: *
+Allow: /
+
+Sitemap: https://setica.in/sitemap.xml
+
+<!-- sitemap.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://setica.in/</loc>
+    <lastmod>2025-04-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+
+<!-- Meta tags to add to <head> section -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SEO META TAGS -->
+<title>Setica - The Everything App for Your Life | Open Source Platform</title>
+<meta name="description" content="Setica is an open-source, all-in-one platform designed to simplify your life. Explore integrated solutions for health, work, finance, and more. Join the waitlist!">
+<meta name="keywords" content="Setica, all-in-one platform, open source, health app, work solution, digital platform">
+<meta name="author" content="Setica">
+<meta property="og:title" content="Setica - The Everything App for Your Life">
+<meta property="og:description" content="An open-source platform that simplifies your life with integrated solutions for health, work, finance, and more.">
+<meta property="og:image" content="https://setica.in/images/setica-preview.jpg">
+<meta property="og:url" content="https://setica.in">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Setica - The Everything App for Your Life">
+<meta name="twitter:description" content="An open-source platform that simplifies your life with integrated solutions.">
+<meta name="twitter:image" content="https://setica.in/images/setica-preview.jpg">
+
+<!-- Link to resources with preconnect for performance -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+<!-- Font and styles -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+
+<!-- Defer non-critical JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js" defer></script>
+<script src="script.js" defer></script>
