@@ -4,62 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Setica - The Everything App for Your Life</title>
+  <!-- Link to the consolidated stylesheet -->
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- GSAP Animation Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
-
-  <style>
-    /* Basic styling for loader visibility */
-    .loader-wrapper {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: #111; display: flex; justify-content: center;
-      align-items: center; z-index: 9999;
-      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
-    }
-    .loader {
-      border: 8px solid #f3f3f3; border-top: 8px solid #3498db;
-      border-radius: 50%; width: 60px; height: 60px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .loaded .loader-wrapper { opacity: 0; visibility: hidden; }
-
-    /* Basic Style for Love Counter in Footer */
-    .footer-love {
-      display: flex; align-items: center; gap: 10px;
-      background-color: rgba(255, 255, 255, 0.08); padding: 8px 15px;
-      border-radius: 20px; cursor: pointer; transition: background-color 0.3s ease;
-      user-select: none; /* Prevent text selection */
-    }
-    .footer-love:hover { background-color: rgba(255, 255, 255, 0.15); }
-    .footer-love .heart-icon { color: #ff4757; font-size: 1.1rem; transition: transform 0.2s ease; }
-    .footer-love.loved .heart-icon { transform: scale(1.2); }
-    .footer-love .love-count { font-weight: 600; font-size: 0.9rem; color: var(--text-color); }
-    .footer-love .love-text { font-size: 0.9rem; color: var(--text-muted); }
-  </style>
+  <!-- GSAP Animation Library (Keep these) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js" defer></script>
+  <!-- Link to the consolidated script file -->
+  <script src="script.js" defer></script>
 </head>
 <body class="loading"> <!-- Start with loading class -->
+
+  <!-- Loader Structure -->
   <div class="loader-wrapper">
     <div class="loader"></div>
   </div>
 
+  <!-- Navigation -->
   <nav>
     <div class="nav-container">
       <div class="logo">
-         <!-- Link logo back to index.html -->
         <a href="index.html"><img src="openart-image_9Aq3L7vH_1744551909797_raw.jpg" alt="Setica Logo"></a>
       </div>
       <div class="nav-links">
-        <!-- Update hrefs to actual pages -->
         <a href="solutions.html">Solutions</a>
         <a href="about.html">About</a>
         <a href="products.html">Products</a>
+        <!-- Optional: Mobile only CTA -->
+        <a href="join-waitlist.html" class="btn btn-primary mobile-cta-button">Join Waitlist</a>
       </div>
       <div class="cta-buttons">
-        <!-- Update href to join-waitlist.html -->
         <a href="join-waitlist.html" class="btn btn-primary" id="nav-start-free">Join Waitlist</a>
       </div>
       <div class="hamburger">
@@ -69,103 +44,50 @@
       </div>
     </div>
   </nav>
-  <div class="mobile-menu-overlay"></div> 
-  <header class="hero">
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay"></div>
+
+  <!-- Hero Section -->
+  <header class="hero" style="background-image: url('./images/vamshikrishnareddy_Lingam_Prompt_Idea__Visualize_the_energy_of_innovation_or_b595443b-4102-43ee-9ef5-dd0fefee1997.jpg');">
     <div class="hero-content">
+      <!-- Use classes for JS targeting -->
       <h1 class="animate-text">Setica: Simplify Your Life</h1>
       <p class="animate-text-delay">
         An open-source platform designed as an all-in-one solution for your life.<br>
         Technology that makes life easier—coming soon.
       </p>
+      <!-- CTA buttons can be here if needed, or just rely on nav -->
+      <!-- <div class="cta-buttons">
+          <a href="join-waitlist.html" class="btn btn-primary animate-button">Join Waitlist</a>
+      </div> -->
     </div>
     <div class="scroll-indicator">
       <p>SCROLL TO EXPLORE</p>
       <i class="fas fa-chevron-down"></i>
     </div>
   </header>
-  
-  <style>
-    .hero {
-      height: 100vh;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-image: url('./images/vamshikrishnareddy_Lingam_Prompt_Idea__Visualize_the_energy_of_innovation_or_b595443b-4102-43ee-9ef5-dd0fefee1997.jpg'); /* Replace with your actual image URL */
-      background-size: cover;
-      background-position: center;
-      position: relative;
-      color: white;
-      text-align: center;
-    }
-    
-    .hero-content {
-      padding: 2rem;
-      z-index: 2;
-    }
-    
-    .animate-text {
-      opacity: 0;
-      animation: fadeIn 1.5s ease-in forwards;
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-    
-    .animate-text-delay {
-      opacity: 0;
-      animation: fadeIn 1.5s ease-in forwards;
-      animation-delay: 0.5s;
-      font-size: 1.2rem;
-      line-height: 1.6;
-    }
-    
-    .scroll-indicator {
-      position: absolute;
-      bottom: 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      animation: bounce 2s infinite;
-    }
-    
-    .scroll-indicator p {
-      margin-bottom: 0.5rem;
-      font-size: 0.8rem;
-      letter-spacing: 2px;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-10px); }
-      60% { transform: translateY(-5px); }
-    }
-  </style>
+
+  <!-- Innovation Section -->
   <section id="innovation" class="dark-section">
     <div class="section-wrapper">
       <div class="content-left">
         <h2>Pioneering the Future of Integration</h2>
         <p>Setica connects the dots between your digital tools and daily tasks, creating seamless workflows and intuitive experiences. Forget juggling multiple apps – embrace a unified platform.</p>
-        <!-- Update href to about.html -->
         <a href="about.html" class="btn btn-outline">Learn About Setica</a>
       </div>
-      <div class="content-right explosion-animation">
-         <p style="color: #aaa; text-align: center;">[Interactive Animation Placeholder]</p>
+      <div class="content-right">
+         <p>[Interactive Animation Placeholder]</p>
+         <!-- Canvas will be added here by JS -->
       </div>
     </div>
   </section>
 
-   <!-- Section linking to About -->
-   <section id="about" class="light-section"> <!-- Keep ID for potential direct scroll links from elsewhere -->
+   <!-- About Section -->
+   <section id="about" class="light-section">
      <div class="section-wrapper reverse">
        <div class="content-left">
          <div class="image-container">
-            <img src="./images/vamshikrishnareddy_Lingam__imagine_prompt__Cinematic_3D_render,_hero_shot_fo_db906f8d-3e51-449f-896b-7014873b1156.jpg" alt="Setica Concept Art" style="border-radius: var(--border-radius); box-shadow: var(--box-shadow);">
+            <img src="./images/vamshikrishnareddy_Lingam__imagine_prompt__Cinematic_3D_render,_hero_shot_fo_db906f8d-3e51-449f-896b-7014873b1156.jpg" alt="Setica Concept Art">
          </div>
        </div>
        <div class="content-right">
@@ -183,15 +105,17 @@
             <p>Built collaboratively with transparency and community focus.</p>
            </div>
          </div>
-         <!-- Optionally add a link to the full about page -->
-          <a href="about.html" class="btn btn-secondary" style="margin-top: 20px;">More About Us</a>
+         <a href="about.html" class="btn btn-secondary" style="margin-top: 20px;">More About Us</a>
        </div>
      </div>
    </section>
 
+  <!-- Digital Frontiers Section -->
   <section id="digital-frontiers" class="cosmic-section">
+    <!-- Background elements -->
     <div class="stars"></div>
     <div class="twinkling"></div>
+    <!-- Content -->
     <div class="section-content">
       <h2 class="section-title">Explore the Possibilities</h2>
       <p>Imagine a world where your digital tools work together effortlessly. Hold the element below to feel the pulse of innovation.</p>
@@ -203,385 +127,175 @@
     </div>
   </section>
 
+  <!-- Solutions Roadmap Section -->
   <section id="solutions-roadmap" class="solutions-section light-section">
-  <div class="section-header">
-    <h2>Featured Solutions & Product Roadmap</h2>
-    <p>Explore Setica's comprehensive ecosystem of integrated solutions currently in development or planned for future releases.</p>
-  </div>
-  
-  <div class="solutions-grid">
-    <!-- TOP TIER SOLUTIONS -->
-    <div class="solution-card-large">
-      <span class="status-tag status-development">In Development</span>
-      <div class="solution-icon-wrapper">
-        <i class="fas fa-briefcase-medical"></i>
-        <h3>Telehealth Platform</h3>
-      </div>
-      <p>Connect with healthcare providers, schedule appointments, and manage your health records - all in one secure location.</p>
-      <ul class="features-list">
-        <li><i class="fas fa-check-circle"></i> Virtual doctor consultations with verified specialists</li>
-        <li><i class="fas fa-check-circle"></i> Secure medical record access and sharing</li>
-        <li><i class="fas fa-check-circle"></i> Integrated ambulance service connectivity</li>
-        <li><i class="fas fa-check-circle"></i> Prescription management and refill requests</li>
-      </ul>
-      <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+    <div class="section-header">
+      <h2>Featured Solutions & Product Roadmap</h2>
+      <p>Explore Setica's comprehensive ecosystem of integrated solutions currently in development or planned for future releases.</p>
     </div>
-    
-    <div class="solution-card-large">
-      <span class="status-tag status-development">In Development</span>
-      <div class="solution-icon-wrapper">
-        <i class="fas fa-hard-hat"></i>
-        <h3>Blue Collar Jobs Platform</h3>
+
+    <div class="solutions-grid">
+      <!-- Solution Card Example (Repeat for all solutions) -->
+      <div class="solution-card-large">
+        <span class="status-tag status-development">In Development</span>
+        <div class="solution-icon-wrapper"> <i class="fas fa-briefcase-medical"></i> <h3>Telehealth Platform</h3> </div>
+        <p>Connect with healthcare providers, schedule appointments, and manage your health records - all in one secure location.</p>
+        <ul class="features-list">
+          <li><i class="fas fa-check-circle"></i> Virtual doctor consultations</li>
+          <li><i class="fas fa-check-circle"></i> Secure medical record access</li>
+          <li><i class="fas fa-check-circle"></i> Ambulance service connectivity</li>
+          <li><i class="fas fa-check-circle"></i> Prescription management</li>
+        </ul>
+        <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
       </div>
-      <p>A dedicated platform connecting skilled workers with relevant opportunities, designed specifically for the underserved blue-collar segment.</p>
-      <ul class="features-list">
-        <li><i class="fas fa-check-circle"></i> AI-powered job matching based on skills & experience</li>
-        <li><i class="fas fa-check-circle"></i> Skill verification and certification tracking</li>
-        <li><i class="fas fa-check-circle"></i> Direct messaging with hiring managers</li>
-        <li><i class="fas fa-check-circle"></i> Career advancement pathways and training resources</li>
-      </ul>
-      <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+      <!-- ... other solution cards ... -->
+       <div class="solution-card-large">
+        <span class="status-tag status-development">In Development</span>
+        <div class="solution-icon-wrapper"> <i class="fas fa-hard-hat"></i> <h3>Blue Collar Jobs Platform</h3> </div>
+        <p>A dedicated platform connecting skilled workers with relevant opportunities, designed specifically for the underserved blue-collar segment.</p>
+        <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> AI-powered job matching</li>
+            <li><i class="fas fa-check-circle"></i> Skill verification tracking</li>
+            <li><i class="fas fa-check-circle"></i> Direct messaging</li>
+            <li><i class="fas fa-check-circle"></i> Career resources</li>
+        </ul>
+        <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+       </div>
+        <div class="solution-card-large">
+          <span class="status-tag status-development">In Development</span>
+          <div class="solution-icon-wrapper"><i class="fas fa-heartbeat"></i><h3>Health & Fitness App</h3></div>
+          <p>Track your nutrition, plan workouts, and monitor your progress with personalized health insights.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Personalized nutrition tracking</li>
+            <li><i class="fas fa-check-circle"></i> Adaptive workout routines</li>
+            <li><i class="fas fa-check-circle"></i> Progress tracking & reports</li>
+            <li><i class="fas fa-check-circle"></i> Wearable device integration</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+         <div class="solution-card-large">
+           <span class="status-tag status-planned">Planned</span>
+           <div class="solution-icon-wrapper"><i class="fas fa-shield-alt"></i><h3>Women's Safety Tools</h3></div>
+           <p>Enhance personal security with location sharing, emergency contacts, and community safety features.</p>
+           <ul class="features-list">
+             <li><i class="fas fa-check-circle"></i> Real-time location sharing</li>
+             <li><i class="fas fa-check-circle"></i> One-tap emergency alert (SOS)</li>
+             <li><i class="fas fa-check-circle"></i> Institutional safety partnerships</li>
+             <li><i class="fas fa-check-circle"></i> Automated journey monitoring</li>
+           </ul>
+           <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+         </div>
+         <div class="solution-card-large">
+           <span class="status-tag status-planned">Planned</span>
+           <div class="solution-icon-wrapper"><i class="fas fa-utensils"></i><h3>Fasting App</h3></div>
+           <p>Specialized tools for intermittent fasting tracking, backed by scientific insights and community support.</p>
+           <ul class="features-list">
+             <li><i class="fas fa-check-circle"></i> Fasting protocol tracking</li>
+             <li><i class="fas fa-check-circle"></i> Scientific insights & metrics</li>
+             <li><i class="fas fa-check-circle"></i> Community support</li>
+             <li><i class="fas fa-check-circle"></i> Health device integration</li>
+           </ul>
+           <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+         </div>
+         <div class="solution-card-large">
+           <span class="status-tag status-planned">Planned</span>
+           <div class="solution-icon-wrapper"><i class="fas fa-building"></i><h3>Construction SaaS</h3></div>
+           <p>Comprehensive management tools designed for construction businesses with low digital adoption.</p>
+           <ul class="features-list">
+             <li><i class="fas fa-check-circle"></i> Project & timeline tracking</li>
+             <li><i class="fas fa-check-circle"></i> Resource & equipment mgmt</li>
+             <li><i class="fas fa-check-circle"></i> Compliance & documentation</li>
+             <li><i class="fas fa-check-circle"></i> Client communication portal</li>
+           </ul>
+           <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+         </div>
+         <div class="solution-card-large">
+           <span class="status-tag status-research">Research</span>
+           <div class="solution-icon-wrapper"><i class="fas fa-coins"></i><h3>Fintech Solution</h3></div>
+           <p>Manage your finances with modern tools for budgeting, seamless payments, and financial wellness insights.</p>
+           <ul class="features-list">
+             <li><i class="fas fa-check-circle"></i> Automated expense tracking</li>
+             <li><i class="fas fa-check-circle"></i> Secure P2P payments</li>
+             <li><i class="fas fa-check-circle"></i> Financial health scoring</li>
+             <li><i class="fas fa-check-circle"></i> Goal-based savings tracking</li>
+           </ul>
+           <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+         </div>
+         <div class="solution-card-large">
+           <span class="status-tag status-planned">Planned</span>
+           <div class="solution-icon-wrapper"><i class="fas fa-shipping-fast"></i><h3>Quick Commerce</h3></div>
+           <p>Order everyday essentials with rapid local delivery, supporting neighborhood businesses.</p>
+           <ul class="features-list">
+             <li><i class="fas fa-check-circle"></i> Sub-30 min local delivery</li>
+             <li><i class="fas fa-check-circle"></i> Local business discovery</li>
+             <li><i class="fas fa-check-circle"></i> Recurring delivery scheduling</li>
+             <li><i class="fas fa-check-circle"></i> Real-time order tracking</li>
+           </ul>
+           <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+         </div>
+         <div class="solution-card-large">
+           <span class="status-tag status-research">Research</span>
+           <div class="solution-icon-wrapper"><i class="fas fa-industry"></i><h3>Manufacturing Management</h3></div>
+           <p>Digital transformation tools for manufacturing operations, inventory control, and production optimization.</p>
+           <ul class="features-list">
+             <li><i class="fas fa-check-circle"></i> Production scheduling</li>
+             <li><i class="fas fa-check-circle"></i> Quality control tracking</li>
+             <li><i class="fas fa-check-circle"></i> Supply chain visibility</li>
+             <li><i class="fas fa-check-circle"></i> Performance dashboards</li>
+           </ul>
+           <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+         </div>
+         <div class="solution-card-large">
+           <span class="status-tag status-research">Research</span>
+           <div class="solution-icon-wrapper"><i class="fas fa-bolt"></i><h3>Energy Distribution</h3></div>
+           <p>Renewable energy marketplace connecting producers and consumers with efficient distribution.</p>
+           <ul class="features-list">
+             <li><i class="fas fa-check-circle"></i> P2P energy trading</li>
+             <li><i class="fas fa-check-circle"></i> Smart grid management</li>
+             <li><i class="fas fa-check-circle"></i> Carbon footprint tracking</li>
+             <li><i class="fas fa-check-circle"></i> Regulatory compliance</li>
+           </ul>
+           <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+         </div>
+         <div class="solution-card-large">
+           <span class="status-tag status-research">Research</span>
+           <div class="solution-icon-wrapper"><i class="fas fa-car"></i><h3>Vayu Ride Sharing</h3></div>
+           <p>Connected transportation service optimizing urban mobility with focus on affordability and efficiency.</p>
+           <ul class="features-list">
+             <li><i class="fas fa-check-circle"></i> Real-time ride matching</li>
+             <li><i class="fas fa-check-circle"></i> Driver verification & safety</li>
+             <li><i class="fas fa-check-circle"></i> Multiple transport options</li>
+             <li><i class="fas fa-check-circle"></i> Loyalty & rewards system</li>
+           </ul>
+           <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+         </div>
+         <div class="solution-card-large">
+           <span class="status-tag status-research">Research</span>
+           <div class="solution-icon-wrapper"><i class="fas fa-calendar-alt"></i><h3>Gatherly Event Platform</h3></div>
+           <p>Organize personal gatherings or discover local events, manage RSVPs, and connect seamlessly.</p>
+           <ul class="features-list">
+             <li><i class="fas fa-check-circle"></i> Easy event creation</li>
+             <li><i class="fas fa-check-circle"></i> Calendar sync & reminders</li>
+             <li><i class="fas fa-check-circle"></i> Local event discovery</li>
+             <li><i class="fas fa-check-circle"></i> Attendee chat & photo sharing</li>
+           </ul>
+           <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+         </div>
     </div>
-    
-    <div class="solution-card-large">
-      <span class="status-tag status-development">In Development</span>
-      <div class="solution-icon-wrapper">
-        <i class="fas fa-heartbeat"></i>
-        <h3>Health & Fitness App</h3>
-      </div>
-      <p>Track your nutrition, plan workouts, and monitor your progress with personalized health insights and recommendations.</p>
-      <ul class="features-list">
-        <li><i class="fas fa-check-circle"></i> Personalized nutrition tracking and meal planning</li>
-        <li><i class="fas fa-check-circle"></i> Adaptive workout routines tailored to your goals</li>
-        <li><i class="fas fa-check-circle"></i> Progress tracking with visual analytics & reports</li>
-        <li><i class="fas fa-check-circle"></i> Integration with popular wearable devices</li>
-      </ul>
-      <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+
+    <div class="view-more-section">
+      <a href="solutions.html" class="btn btn-outline">View All Solutions</a>
+      <a href="products.html" class="btn btn-primary">See Full Product Roadmap</a>
     </div>
-    
-    <div class="solution-card-large">
-      <span class="status-tag status-planned">Planned</span>
-      <div class="solution-icon-wrapper">
-        <i class="fas fa-shield-alt"></i>
-        <h3>Women's Safety Tools</h3>
-      </div>
-      <p>Enhance personal security with location sharing, emergency contacts, and community safety features designed with women's safety in mind.</p>
-      <ul class="features-list">
-        <li><i class="fas fa-check-circle"></i> Real-time location sharing with trusted contacts</li>
-        <li><i class="fas fa-check-circle"></i> One-tap emergency alert system (SOS)</li>
-        <li><i class="fas fa-check-circle"></i> Institutional partnerships for enhanced safety</li>
-        <li><i class="fas fa-check-circle"></i> Automated journey monitoring for travel safety</li>
-      </ul>
-      <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
-    </div>
-    
-    <!-- SECOND TIER SOLUTIONS -->
-    <div class="solution-card-large">
-      <span class="status-tag status-planned">Planned</span>
-      <div class="solution-icon-wrapper">
-        <i class="fas fa-utensils"></i>
-        <h3>Fasting App</h3>
-      </div>
-      <p>Specialized tools for intermittent fasting tracking, backed by scientific insights and community support.</p>
-      <ul class="features-list">
-        <li><i class="fas fa-check-circle"></i> Multiple fasting protocol templates and tracking</li>
-        <li><i class="fas fa-check-circle"></i> Scientifically-backed insights and progress metrics</li>
-        <li><i class="fas fa-check-circle"></i> Community support and achievement sharing</li>
-        <li><i class="fas fa-check-circle"></i> Integration with health monitoring devices</li>
-      </ul>
-      <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
-    </div>
-    
-    <div class="solution-card-large">
-      <span class="status-tag status-planned">Planned</span>
-      <div class="solution-icon-wrapper">
-        <i class="fas fa-building"></i>
-        <h3>Construction SaaS</h3>
-      </div>
-      <p>Comprehensive management tools designed specifically for construction businesses with low digital adoption.</p>
-      <ul class="features-list">
-        <li><i class="fas fa-check-circle"></i> Project management and timeline tracking</li>
-        <li><i class="fas fa-check-circle"></i> Resource allocation and equipment management</li>
-        <li><i class="fas fa-check-circle"></i> Regulatory compliance and documentation</li>
-        <li><i class="fas fa-check-circle"></i> Client communications and reporting portal</li>
-      </ul>
-      <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
-    </div>
-    
-    <div class="solution-card-large">
-      <span class="status-tag status-research">Research</span>
-      <div class="solution-icon-wrapper">
-        <i class="fas fa-coins"></i>
-        <h3>Fintech Solution</h3>
-      </div>
-      <p>Manage your finances with modern tools for budgeting, seamless payments, and personalized financial wellness insights.</p>
-      <ul class="features-list">
-        <li><i class="fas fa-check-circle"></i> Automated expense tracking and smart budgeting</li>
-        <li><i class="fas fa-check-circle"></i> Secure & instant peer-to-peer payments</li>
-        <li><i class="fas fa-check-circle"></i> Financial health scoring and actionable advice</li>
-        <li><i class="fas fa-check-circle"></i> Goal-based savings automation & tracking</li>
-      </ul>
-      <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
-    </div>
-    
-    <div class="solution-card-large">
-      <span class="status-tag status-planned">Planned</span>
-      <div class="solution-icon-wrapper">
-        <i class="fas fa-shipping-fast"></i>
-        <h3>Quick Commerce</h3>
-      </div>
-      <p>Order everyday essentials with rapid local delivery, supporting neighborhood businesses while getting what you need fast.</p>
-      <ul class="features-list">
-        <li><i class="fas fa-check-circle"></i> Sub-30 minute delivery from local stores</li>
-        <li><i class="fas fa-check-circle"></i> Curated local business discovery & support</li>
-        <li><i class="fas fa-check-circle"></i> Smart scheduling for recurring deliveries</li>
-        <li><i class="fas fa-check-circle"></i> Real-time order tracking & communication</li>
-      </ul>
-      <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
-    </div>
-    
-    <!-- THIRD TIER SOLUTIONS -->
-    <div class="solution-card-large">
-      <span class="status-tag status-research">Research</span>
-      <div class="solution-icon-wrapper">
-        <i class="fas fa-industry"></i>
-        <h3>Manufacturing Management</h3>
-      </div>
-      <p>Digital transformation tools for manufacturing operations, inventory control, and production optimization.</p>
-      <ul class="features-list">
-        <li><i class="fas fa-check-circle"></i> Production scheduling and resource allocation</li>
-        <li><i class="fas fa-check-circle"></i> Quality control and defect tracking</li>
-        <li><i class="fas fa-check-circle"></i> Supply chain integration and visibility</li>
-        <li><i class="fas fa-check-circle"></i> Performance analytics and reporting dashboards</li>
-      </ul>
-      <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
-    </div>
-    
-    <div class="solution-card-large">
-      <span class="status-tag status-research">Research</span>
-      <div class="solution-icon-wrapper">
-        <i class="fas fa-bolt"></i>
-        <h3>Energy Distribution</h3>
-      </div>
-      <p>Renewable energy marketplace connecting producers and consumers with efficient distribution management.</p>
-      <ul class="features-list">
-        <li><i class="fas fa-check-circle"></i> Peer-to-peer energy trading platform</li>
-        <li><i class="fas fa-check-circle"></i> Smart grid integration and management</li>
-        <li><i class="fas fa-check-circle"></i> Carbon footprint tracking and reduction tools</li>
-        <li><i class="fas fa-check-circle"></i> Regulatory compliance and reporting</li>
-      </ul>
-      <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
-    </div>
-    
-    <div class="solution-card-large">
-      <span class="status-tag status-research">Research</span>
-      <div class="solution-icon-wrapper">
-        <i class="fas fa-car"></i>
-        <h3>Vayu Ride Sharing</h3>
-      </div>
-      <p>Connected transportation service optimizing urban mobility with focus on affordability and efficiency.</p>
-      <ul class="features-list">
-        <li><i class="fas fa-check-circle"></i> Real-time ride matching and routing</li>
-        <li><i class="fas fa-check-circle"></i> Driver verification and safety features</li>
-        <li><i class="fas fa-check-circle"></i> Multiple transportation options in one app</li>
-        <li><i class="fas fa-check-circle"></i> Loyalty program and rewards system</li>
-      </ul>
-      <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
-    </div>
-    
-    <div class="solution-card-large">
-      <span class="status-tag status-research">Research</span>
-      <div class="solution-icon-wrapper">
-        <i class="fas fa-calendar-alt"></i>
-        <h3>Gatherly Event Platform</h3>
-      </div>
-      <p>Organize personal gatherings or discover local events, manage RSVPs, and connect with attendees seamlessly.</p>
-      <ul class="features-list">
-        <li><i class="fas fa-check-circle"></i> Easy event creation and invitation management</li>
-        <li><i class="fas fa-check-circle"></i> Integrated calendar syncing and reminders</li>
-        <li><i class="fas fa-check-circle"></i> Local event discovery based on interests</li>
-        <li><i class="fas fa-check-circle"></i> Group chat and photo sharing for attendees</li>
-      </ul>
-      <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
-    </div>
-  </div>
-  
-  <div class="view-more-section" style="text-align: center; margin-top: 40px;">
-    <a href="solutions.html" class="btn btn-outline">View All Solutions</a>
-    <a href="products.html" class="btn btn-primary">See Full Product Roadmap</a>
-  </div>
-</section>
+  </section>
 
-<style>
-  /* Grid Layout Styles */
-  /* === Updated Styles for Solutions Section (Dark Theme) === */
-
-/* Grid Layout Styles */
-.solutions-section {
-  padding: 80px 5%;
-  /* Use the main dark background */
-  background-color: var(--dark-bg);
-  color: var(--text-color); /* Default text color for the section */
-  position: relative;
-}
-
-.solutions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 30px;
-  max-width: 1400px;
-  margin: 40px auto 0;
-}
-
-.solution-card-large {
-  /* Use the dark card background */
-  background-color: var(--dark-card);
-  border-radius: var(--border-radius, 12px); /* Use theme radius */
-  padding: 1.8rem;
-  height: 100%;
-  transition: var(--transition, all 0.3s ease); /* Use theme transition */
-  display: flex;
-  flex-direction: column;
-  /* Use subtle white border for dark theme */
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  /* Use theme shadow or a dark-theme appropriate one */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.solution-card-large:hover {
-  transform: translateY(-5px); /* Keep or adjust as desired */
-  /* Use primary color for hover border */
-  border-color: var(--primary-color);
-   /* Enhance shadow on hover, potentially with theme color glow */
-  box-shadow: 0 8px 24px rgba(74, 85, 255, 0.15);
-  /* Optional: Slightly change background on hover like other cards */
-  /* background-color: rgba(255, 255, 255, 0.06); */
-}
-
-.solution-icon-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 1.2rem;
-}
-
-.solution-icon-wrapper i {
-  font-size: 2rem;
-  /* Use primary color for icons */
-  color: var(--primary-color);
-  width: 40px;
-  text-align: center;
-}
-
-.solution-icon-wrapper h3 {
-  margin-bottom: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  /* Use standard text color */
-  color: var(--text-color);
-}
-
-.solution-card-large p {
-  margin-bottom: 1.2rem;
-  /* Use muted text color for descriptions */
-  color: var(--text-muted);
-  line-height: 1.6;
-}
-
-.features-list {
-  margin: 1rem 0;
-  padding-left: 0;
-  list-style: none;
-}
-
-.features-list li {
-  margin-bottom: 0.6rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 0.9rem;
-  /* Use muted text color for list items */
-  color: var(--text-muted);
-}
-
-.features-list li i {
-  /* Use primary color for check icons */
-  color: var(--primary-color);
-  font-size: 0.9rem;
-  margin-top: 3px;
-}
-
-.status-tag {
-  display: inline-block;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Updated Status Tag colors for dark background */
-.status-development {
-  background-color: rgba(74, 85, 255, 0.15); /* Primary color with alpha */
-  color: var(--primary-color);
-}
-
-.status-planned {
-   background-color: rgba(255, 111, 0, 0.15); /* Secondary color with alpha */
-   color: var(--secondary-color);
-}
-
-.status-research {
-  background-color: rgba(0, 184, 148, 0.15); /* Teal color with alpha */
-  color: #00b894;
-}
-
-.read-more {
-  margin-top: auto;
-  padding-top: 1rem;
-  font-weight: 600;
-  /* Use primary color for links */
-  color: var(--primary-color);
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  transition: var(--transition, all 0.3s);
-  align-self: flex-start;
-}
-
-.read-more:hover {
-  gap: 10px;
-  /* Use primary dark color for hover */
-  color: var(--primary-dark, #3a45e0); /* Use variable if defined, else fallback */
-}
-
-/* Button styles (.btn, .btn-outline, .btn-primary) are assumed */
-/* to be defined globally in styles.css and are inherited.      */
-/* Remove specific button styles from here if they existed.     */
-
-
-/* Responsive adjustments (Keep these as they affect layout) */
-@media (max-width: 768px) {
-  .solutions-grid {
-    grid-template-columns: 1fr;
-  }
-
-  /* If .view-more-section uses these buttons, keep this style */
-  .view-more-section .btn {
-     margin: 5px;
-     min-width: 140px;
-   }
-}
-
-/* === End of Updated Styles === */
-</style>
+  <!-- Demo Section -->
   <section id="demo" class="demo-section light-section">
     <div class="section-wrapper single-column">
       <h2>See Setica in Action (Concept)</h2>
       <div class="video-container">
-        <div class="placeholder-video" onclick="alert('Conceptual demo video link/player needed here.');">
+        <!-- Placeholder triggers JS modal -->
+        <div class="placeholder-video">
           <div class="play-button"> <i class="fas fa-play"></i> </div>
           <p>Watch Concept Demo</p>
         </div>
@@ -589,257 +303,78 @@
     </div>
   </section>
 
-  <section id="cta" class="cta-section">
+  <!-- CTA Section -->
+   <section id="cta" class="cta-section">
      <div class="overlay"></div>
      <div class="cta-content">
        <h2>Ready to Simplify Your Life?</h2>
        <p>Join the waitlist and be the first to experience the unified Setica platform.</p>
-       <!-- Update href to join-waitlist.html -->
        <a href="join-waitlist.html" class="btn btn-cta" id="cta-start-free">JOIN WAITLIST →</a>
      </div>
    </section>
 
+   <!-- Footer -->
    <footer>
     <div class="footer-container">
-        <div class="footer-left"> 
-          <img src="openart-image_9Aq3L7vH_1744551909797_raw.jpg" alt="Setica Logo"> 
-          <p>Copyright © <span id="copyright-year">2024</span> Setica.<br>All rights reserved.</p> 
-          <p style="margin-top: 15px; font-size: 0.8rem;">An open-source initiative.</p> 
+        <div class="footer-left">
+          <img src="openart-image_9Aq3L7vH_1744551909797_raw.jpg" alt="Setica Logo">
+          <p>Copyright © <span id="copyright-year">2024</span> Setica.<br>All rights reserved.</p>
+          <p>An open-source initiative.</p>
         </div>
-        <div class="footer-links"> 
-          <div class="footer-column"> 
-            <h3>Platform</h3> 
-            <ul> 
-              <li><a href="solutions.html">Solutions</a></li> 
-              <li><a href="products.html">Product Roadmap</a></li> 
-              <li><a href="about.html">About Setica</a></li> 
-            </ul> 
-          </div> 
-          <div class="footer-column" id="resources"> 
-            <h3>Resources</h3> 
-            <ul> 
-              <li><a href="https://github.com/your-setica-repo" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li> 
-              <li><a href="#">Documentation (Upcoming)</a></li> 
-              <li><a href="#">API Reference (Upcoming)</a></li> 
-              <li><a href="#">Contribution Guide</a></li> 
-            </ul> 
-          </div> 
-          <div class="footer-column"> 
-            <h3>Company</h3> 
-            <ul> 
-              <li><a href="about.html">About Us</a></li> 
-              <li><a href="#">Careers (Coming Soon)</a></li> 
-              <li><a href="mailto:lingamvamshikrishnareddy@gmail.com">Contact</a></li> 
-              <li><a href="#">Privacy Policy</a></li> 
-            </ul> 
-          </div> 
+        <div class="footer-links">
+          <div class="footer-column">
+            <h3>Platform</h3>
+            <ul>
+              <li><a href="solutions.html">Solutions</a></li>
+              <li><a href="products.html">Product Roadmap</a></li>
+              <li><a href="about.html">About Setica</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h3>Resources</h3>
+            <ul>
+              <li><a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+              <li><a href="#">Documentation (Upcoming)</a></li>
+              <li><a href="#">API Reference (Upcoming)</a></li>
+              <li><a href="#">Contribution Guide</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h3>Company</h3>
+            <ul>
+              <li><a href="about.html">About Us</a></li>
+              <li><a href="#">Careers (Coming Soon)</a></li>
+              <li><a href="mailto:lingamvamshikrishnareddy@gmail.com">Contact</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+            </ul>
+          </div>
         </div>
-        <div class="footer-social"> 
-          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a> 
-          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a> 
-          <a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a> 
-          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a> 
+        <div class="footer-social">
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+          <a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
         </div>
       </div>
-      <div class="footer-bottom"> 
-        <p>Made with <i class="fas fa-heart heart-icon"></i> and Open Source principles. Site developed with assistance from Claude.</p> 
-        <div class="footer-love" id="love-it-button"> 
-          <span class="love-text">Loved it?</span> 
-          <span class="heart-icon">❤️</span> 
-          <span class="love-count" id="love-counter">0</span> 
-        </div> 
+      <div class="footer-bottom">
+        <p>Made with <i class="fas fa-heart heart-icon"></i> and Open Source principles. Site developed with assistance from Claude.</p>
+        <div class="footer-love" id="love-it-button">
+          <span class="love-text">Loved it?</span>
+          <span class="heart-icon">❤️</span> <!-- Use FontAwesome or Emoji -->
+          <span class="love-count" id="love-counter">0</span>
+        </div>
       </div>
   </footer>
-<!-- Audio elements -->
+
+<!-- Audio elements (Keep these) -->
 <audio id="sound-click-1" src="audio/click-sound-1.wav" preload="auto"></audio>
 <audio id="sound-click-2" src="audio/click-sound-2.wav" preload="auto"></audio>
 <audio id="sound-interact" src="audio/interact-hold.mp3" preload="auto"></audio>
 
-<!-- Main script file -->
-<script src="script.js"></script>
+<!--
+  Removed inline script block.
+  All its logic is now moved to script.js within the DOMContentLoaded listener.
+-->
 
-<!-- Inline script with fixed navigation -->
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const body = document.body;
-
-    // --- Loader ---
-    window.addEventListener('load', () => {
-        body.classList.remove('loading');
-        body.classList.add('loaded');
-        const loaderWrapper = document.querySelector('.loader-wrapper');
-        if (loaderWrapper) {
-            loaderWrapper.style.opacity = '0';
-            loaderWrapper.style.visibility = 'hidden';
-        }
-    });
-    body.classList.add('loading');
-
-    // --- Sound Playback ---
-    const sound1 = document.getElementById('sound-click-1');
-    const sound2 = document.getElementById('sound-click-2');
-    const soundInteract = document.getElementById('sound-interact');
-
-    const playSound = (audioElement) => {
-      if (audioElement) {
-        audioElement.currentTime = 0;
-        // Return the play promise for chaining, but don't wait for it to continue navigation
-        return audioElement.play().catch(error => console.log("Audio play prevented:", error));
-      }
-      return Promise.resolve(); // Return resolved promise if no audio element
-    };
-
-    // FIXED: Handle navigation buttons with sound - REMOVE preventDefault()
-    // This allows the links to navigate after playing sound
-    const heroStartBtn = document.getElementById('hero-start-btn');
-    const heroJoinBtn = document.getElementById('hero-join-btn');
-    
-    if (heroStartBtn) {
-      heroStartBtn.addEventListener('click', () => {
-        playSound(sound1);
-        console.log("Start Now Free clicked");
-        // Navigation will proceed normally
-      });
-    }
-    
-    if (heroJoinBtn) {
-      heroJoinBtn.addEventListener('click', () => {
-        playSound(sound2);
-        console.log("Join Our Mission clicked");
-        // Navigation will proceed normally
-      });
-    }
-    
-    // Handle other navigation buttons with sound
-    ['nav-start-free', 'pricing-start-free', 'cta-start-free'].forEach(id => {
-      const btn = document.getElementById(id);
-      if (btn) {
-        btn.addEventListener('click', () => {
-          playSound(sound1);
-          console.log(`Button ${id} clicked`);
-          // Navigation will proceed normally
-        });
-      }
-    });
-
-    // Fix outline buttons
-    document.querySelectorAll('.btn-outline').forEach(btn => {
-      btn.addEventListener('click', () => {
-        playSound(sound1);
-        console.log(`Outline button clicked, href: ${btn.href}`);
-        // Navigation will proceed normally
-      });
-    });
-
-    // Interactive element
-    const interactElement = document.getElementById('hold-interact-element');
-    if (interactElement) {
-      interactElement.addEventListener('mousedown', () => playSound(soundInteract));
-      interactElement.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // Prevent scrolling on touch elements is okay
-        playSound(soundInteract);
-      });
-    }
-
-    // --- Dynamic Copyright Year ---
-    const yearSpan = document.getElementById('copyright-year');
-    if (yearSpan) {
-      yearSpan.textContent = new Date().getFullYear();
-    }
-
-    // --- Love Counter Logic ---
-    const loveButton = document.getElementById('love-it-button');
-    const loveCounterSpan = document.getElementById('love-counter');
-    const localStorageKey = 'seticaLoveCount';
-    const lovedStateKey = 'seticaLovedState';
-
-    let currentLoveCount = parseInt(localStorage.getItem(localStorageKey) || '0');
-    let userHasLoved = localStorage.getItem(lovedStateKey) === 'true';
-
-    function updateLoveDisplay() {
-      if(loveCounterSpan) {
-        loveCounterSpan.textContent = currentLoveCount;
-      }
-      if(loveButton) {
-        if(userHasLoved) {
-          loveButton.classList.add('loved');
-        } else {
-          loveButton.classList.remove('loved');
-        }
-      }
-    }
-
-    if (loveButton && loveCounterSpan) {
-      updateLoveDisplay(); // Initial display
-
-      loveButton.addEventListener('click', () => {
-        if (!userHasLoved) {
-          currentLoveCount++;
-          userHasLoved = true;
-          localStorage.setItem(localStorageKey, currentLoveCount);
-          localStorage.setItem(lovedStateKey, 'true');
-          updateLoveDisplay();
-
-          // Add animation if GSAP is available
-          if (typeof gsap !== 'undefined') {
-            gsap.fromTo(loveButton.querySelector('.heart-icon'),
-              { scale: 1 },
-              { scale: 1.4, duration: 0.3, ease: 'back.out(3)', yoyo: true, repeat: 1 }
-            );
-          }
-        } else {
-          console.log("User has already loved this.");
-          // Optional shake effect
-          if (typeof gsap !== 'undefined') {
-            gsap.fromTo(loveButton, {x: 0}, {x: 5, duration:0.1, repeat: 3, yoyo: true, clearProps: "x"});
-          }
-        }
-      });
-    }
-
-    // --- Hamburger Menu Toggle ---
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-    const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
-
-    if (hamburger && navLinks) {
-      hamburger.addEventListener('click', () => {
-        if (sound1) playSound(sound1);
-        hamburger.classList.toggle('active');
-        navLinks.classList.toggle('active');
-        if (mobileMenuOverlay) mobileMenuOverlay.classList.toggle('active');
-      });
-      
-      if (mobileMenuOverlay) {
-        mobileMenuOverlay.addEventListener('click', () => {
-          hamburger.classList.remove('active');
-          navLinks.classList.remove('active');
-          mobileMenuOverlay.classList.remove('active');
-        });
-      }
-      
-      navLinks.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-          if (hamburger.classList.contains('active')) { // Only close if mobile menu is open
-            hamburger.classList.remove('active');
-            navLinks.classList.remove('active');
-            if (mobileMenuOverlay) mobileMenuOverlay.classList.remove('active');
-          }
-        });
-      });
-    }
-
-    // --- GSAP/ScrollTrigger dependent parts ---
-    if (typeof ScrollTrigger !== 'undefined') {
-      const nav = document.querySelector('nav');
-      if (nav) {
-        ScrollTrigger.create({
-          start: "top top", end: 99999,
-          onUpdate: (self) => {
-            nav.classList.toggle('scrolled', self.scroll() > 50);
-          }
-        });
-      }
-    }
-  }); // End DOMContentLoaded
-</script>
+</body>
+</html>
