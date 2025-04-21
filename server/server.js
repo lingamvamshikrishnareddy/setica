@@ -68,6 +68,10 @@ const LoveCountSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  browsers: {
+    type: [String],
+    default: []
+  },
   lastUpdated: {
     type: Date,
     default: Date.now
@@ -90,11 +94,11 @@ async function initializeCounters() {
     } else {
       console.log('Interest counter exists with count:', interestCounter.count);
     }
-    
+
     // Love counter
     const loveCounter = await LoveCount.findOne({ counterId: 'main' });
     if (!loveCounter) {
-      await LoveCount.create({ counterId: 'main', count: 0 });
+      await LoveCount.create({ counterId: 'main', count: 0, browsers: [] });
       console.log('Love counter initialized');
     } else {
       console.log('Love counter exists with count:', loveCounter.count);
@@ -153,24 +157,37 @@ app.get('/api/love-count', async (req, res) => {
 // 4. Increment love count - ENHANCED
 app.post('/api/love-count/increment', async (req, res) => {
   console.log('POST request received to increment love count');
+  console.log('Request body:', req.body);
+
   try {
+    const browserId = req.body.browserId || 'unknown';
+
     // First find the current document
     let counter = await LoveCount.findOne({ counterId: 'main' });
-    
+
     if (!counter) {
-      // Create if doesn't exist
-      counter = await LoveCount.create({ counterId: 'main', count: 1 });
+      // Create if doesn't exist with the first browser ID
+      counter = await LoveCount.create({
+        counterId: 'main',
+        count: 1,
+        browsers: [browserId]
+      });
       console.log('Created new love counter with count 1');
     } else {
-      // Update existing counter
+      // Add browser ID if it doesn't exist and increment count
       counter = await LoveCount.findOneAndUpdate(
         { counterId: 'main' },
-        { $inc: { count: 1 }, lastUpdated: Date.now() },
+        {
+          $inc: { count: 1 },
+          $addToSet: { browsers: browserId },
+          lastUpdated: Date.now()
+        },
         { new: true }
       );
       console.log('Incremented love count to:', counter.count);
+      console.log('Total unique browsers:', counter.browsers.length);
     }
-    
+
     res.json({ success: true, count: counter.count });
   } catch (err) {
     console.error('Error incrementing love count:', err.stack);
@@ -178,26 +195,41 @@ app.post('/api/love-count/increment', async (req, res) => {
   }
 });
 
-// 5. Add email to waitlist
+// 5. Add a diagnostic endpoint to see all counter data
+app.get('/api/love-count/details', async (req, res) => {
+  try {
+    const counter = await LoveCount.findOne({ counterId: 'main' });
+    res.json({
+      count: counter ? counter.count : 0,
+      totalBrowsers: counter ? counter.browsers.length : 0,
+      lastUpdated: counter ? counter.lastUpdated : null
+    });
+  } catch (err) {
+    console.error('Error fetching love count details:', err);
+    res.status(500).json({ error: 'Server error', message: err.message });
+  }
+});
+
+// 6. Add email to waitlist
 app.post('/api/waitlist', async (req, res) => {
   try {
     const { email } = req.body;
-    
+
     // Validate email
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: 'Invalid email address' });
     }
-    
+
     // Check if email already exists
     const existingEmail = await Waitlist.findOne({ email });
     if (existingEmail) {
       return res.status(409).json({ error: 'Email already on waitlist' });
     }
-    
+
     // Add to waitlist
     const newEntry = new Waitlist({ email });
     await newEntry.save();
-    
+
     res.status(201).json({ success: true, message: 'Added to waitlist' });
   } catch (err) {
     console.error('Error adding to waitlist:', err);
