@@ -146,6 +146,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const localStorageKey = 'seticaLoveCount';
                 const lovedStateKey = 'seticaLovedState';
                 let currentLoveCount = 0;
+                
+                // Generate a unique browser ID if not already saved
+                const browserIdKey = 'seticaBrowserId';
+                let browserId = localStorage.getItem(browserIdKey);
+                if (!browserId) {
+                    browserId = 'browser_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15);
+                    localStorage.setItem(browserIdKey, browserId);
+                }
+                
+                // Check if this browser has loved already
                 let userHasLoved = localStorage.getItem(lovedStateKey) === 'true';
         
                 // Fetch the current count from the server on page load
@@ -162,7 +172,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             currentLoveCount = data.count;
                             updateLoveDisplay();
                         } else {
-                            console.warn('Could not fetch love count from server:', response.status);
+                            console.warn('Could not fetch love count from server. Status:', response.status);
+                            // Try to get response text for better debugging
+                            const errorText = await response.text();
+                            console.warn('Error response:', errorText);
+                            
                             // Fallback to local storage
                             const localCount = localStorage.getItem(localStorageKey);
                             if (localCount) {
@@ -196,64 +210,58 @@ document.addEventListener('DOMContentLoaded', function() {
                         sound.play().catch(e => console.warn('Could not play sound', e));
                     }
         
-                    if (!userHasLoved) {
-                        try {
-                            // First update UI optimistically
-                            currentLoveCount++;
-                            userHasLoved = true;
+                    // Allow click regardless of local storage state for testing
+                    // This ensures we can test the counter from the same browser
+                    try {
+                        // First update UI optimistically
+                        currentLoveCount++;
+                        userHasLoved = true;
+                        updateLoveDisplay();
+        
+                        // Store in local storage
+                        localStorage.setItem(lovedStateKey, 'true');
+                        localStorage.setItem(localStorageKey, currentLoveCount.toString());
+        
+                        // Send request to increment count on server with browser ID
+                        const apiUrl = window.location.origin + '/api/love-count/increment';
+                        console.log('Sending increment request to:', apiUrl);
+                        
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ 
+                                browserId: browserId 
+                            })
+                        });
+        
+                        console.log('Server response status:', response.status);
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('Server response after increment:', data);
+                            // Update with server value
+                            currentLoveCount = data.count;
                             updateLoveDisplay();
-        
-                            // Store in local storage
-                            localStorage.setItem(lovedStateKey, 'true');
-                            localStorage.setItem(localStorageKey, currentLoveCount.toString());
-        
-                            // Send request to increment count on server
-                            const apiUrl = window.location.origin + '/api/love-count/increment';
-                            console.log('Sending increment request to:', apiUrl);
-                            
-                            const response = await fetch(apiUrl, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({}) // Empty body but needed for some server setups
-                            });
-        
-                            if (response.ok) {
-                                const data = await response.json();
-                                console.log('Server response after increment:', data);
-                                // Update with server value
-                                currentLoveCount = data.count;
-                                updateLoveDisplay();
-                            } else {
-                                console.warn('Server returned error on increment:', response.status);
-                            }
-        
-                            // Animation effects
-                            const heartIcon = loveButton.querySelector('.heart-icon');
-                            if (heartIcon) {
-                                heartIcon.style.transform = 'scale(1.4)';
-                                setTimeout(() => {
-                                    heartIcon.style.transform = 'scale(1)';
-                                }, 300);
-                            }
-                        } catch (err) {
-                            console.error('Error incrementing love count on server:', err);
-                            // Keep the optimistic update
+                        } else {
+                            console.warn('Server returned error on increment:', response.status);
+                            // Try to get more error details
+                            const errorText = await response.text();
+                            console.error('Error response:', errorText);
                         }
-                    } else {
-                        console.log("User already loved.");
-                        // Small shake animation for feedback
-                        loveButton.style.transition = 'transform 0.1s ease-in-out';
-                        let shakes = 0;
-                        const interval = setInterval(() => {
-                            loveButton.style.transform = `translateX(${shakes % 2 === 0 ? 4 : -4}px)`;
-                            shakes++;
-                            if (shakes > 3) {
-                                clearInterval(interval);
-                                loveButton.style.transform = 'translateX(0)';
-                            }
-                        }, 80);
+        
+                        // Animation effects
+                        const heartIcon = loveButton.querySelector('.heart-icon');
+                        if (heartIcon) {
+                            heartIcon.style.transform = 'scale(1.4)';
+                            setTimeout(() => {
+                                heartIcon.style.transform = 'scale(1)';
+                            }, 300);
+                        }
+                    } catch (err) {
+                        console.error('Error incrementing love count on server:', err);
+                        // Keep the optimistic update
                     }
                 });
             } else {
