@@ -141,25 +141,29 @@ document.addEventListener('DOMContentLoaded', function() {
         const initializeLoveButton = () => {
             const loveButton = document.getElementById('love-it-button');
             const loveCounterSpan = document.getElementById('love-counter');
-
+        
             if (loveButton && loveCounterSpan) {
                 const localStorageKey = 'seticaLoveCount';
                 const lovedStateKey = 'seticaLovedState';
                 let currentLoveCount = 0;
                 let userHasLoved = localStorage.getItem(lovedStateKey) === 'true';
-
+        
                 // Fetch the current count from the server on page load
                 const fetchLoveCount = async () => {
                     try {
-                        const response = await fetch('/api/love-count');
+                        // Make sure the URL is correct - adjust if your API is on a different domain
+                        const apiUrl = window.location.origin + '/api/love-count';
+                        console.log('Fetching love count from:', apiUrl);
+                        
+                        const response = await fetch(apiUrl);
                         if (response.ok) {
                             const data = await response.json();
+                            console.log('Received love count from server:', data);
                             currentLoveCount = data.count;
                             updateLoveDisplay();
                         } else {
-                            // Handle error more gracefully
-                            console.warn('Could not fetch love count from server, using fallback');
-                            // Try to use local count as fallback
+                            console.warn('Could not fetch love count from server:', response.status);
+                            // Fallback to local storage
                             const localCount = localStorage.getItem(localStorageKey);
                             if (localCount) {
                                 currentLoveCount = parseInt(localCount, 10);
@@ -167,8 +171,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             updateLoveDisplay();
                         }
                     } catch (err) {
-                        console.warn('Error fetching love count, using fallback:', err);
-                        // Try to use local count as fallback
+                        console.error('Error fetching love count:', err);
+                        // Fallback to local storage
                         const localCount = localStorage.getItem(localStorageKey);
                         if (localCount) {
                             currentLoveCount = parseInt(localCount, 10);
@@ -176,48 +180,55 @@ document.addEventListener('DOMContentLoaded', function() {
                         updateLoveDisplay();
                     }
                 };
-
+        
                 const updateLoveDisplay = () => {
                     loveCounterSpan.textContent = currentLoveCount;
                     loveButton.classList.toggle('loved', userHasLoved);
                 };
-
+        
                 // Initially fetch the count from server
                 fetchLoveCount();
-
+        
                 loveButton.addEventListener('click', async () => {
                     // Play sound if available
                     const sound = document.getElementById('sound-click-2');
                     if (sound) {
                         sound.play().catch(e => console.warn('Could not play sound', e));
                     }
-
+        
                     if (!userHasLoved) {
                         try {
                             // First update UI optimistically
                             currentLoveCount++;
                             userHasLoved = true;
                             updateLoveDisplay();
-
+        
                             // Store in local storage
                             localStorage.setItem(lovedStateKey, 'true');
                             localStorage.setItem(localStorageKey, currentLoveCount.toString());
-
+        
                             // Send request to increment count on server
-                            const response = await fetch('/api/love-count/increment', {
+                            const apiUrl = window.location.origin + '/api/love-count/increment';
+                            console.log('Sending increment request to:', apiUrl);
+                            
+                            const response = await fetch(apiUrl, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'
-                                }
+                                },
+                                body: JSON.stringify({}) // Empty body but needed for some server setups
                             });
-
+        
                             if (response.ok) {
                                 const data = await response.json();
+                                console.log('Server response after increment:', data);
                                 // Update with server value
                                 currentLoveCount = data.count;
                                 updateLoveDisplay();
+                            } else {
+                                console.warn('Server returned error on increment:', response.status);
                             }
-
+        
                             // Animation effects
                             const heartIcon = loveButton.querySelector('.heart-icon');
                             if (heartIcon) {
@@ -227,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 }, 300);
                             }
                         } catch (err) {
-                            console.warn('Error incrementing love count on server:', err);
+                            console.error('Error incrementing love count on server:', err);
                             // Keep the optimistic update
                         }
                     } else {
@@ -249,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.warn("Love counter elements not found.");
             }
         };
-
+        
         initializeLoveButton();
 
         // --- Demo Video Modal Trigger ---
