@@ -1,9 +1,6 @@
 [build]
-  command = "npm run build"
+  command = "node replace-env.js"
   publish = "."
 
 [build.environment]
   NODE_VERSION = "18"
-
-[[plugins]]
-  package = "@netlify/plugin-env-var-expose"
