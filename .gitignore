@@ -3,9 +3,7 @@
 .env.local
 .env.production
 
-# Firebase config (if storing separately)
-js/config.js
-config.js
+
 
 # Node modules (if using build tools)
 node_modules/
