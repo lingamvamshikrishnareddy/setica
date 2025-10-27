@@ -180,6 +180,7 @@
       border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
+    /* Glassmorphism Stat Cards - Matching Services Style */
     .stat-box {
       position: relative;
       background: rgba(255, 255, 255, 0.03);
@@ -211,6 +212,7 @@
       opacity: 1;
     }
 
+    /* Animated Border */
     .stat-box::after {
       content: '';
       position: absolute;
@@ -474,8 +476,265 @@
     </div>
   </footer>
 
-  <!-- Load config and main script -->
-  <script src="./config.js"></script>
-  <script src="./waitlist.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const body = document.body;
+
+      // Firebase Configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAQVWWGPkJjhxPBKSE5S1ctKcckKXjNze8",
+        authDomain: "setica-eca6f.firebaseapp.com",
+        projectId: "setica-eca6f",
+        storageBucket: "setica-eca6f.firebasestorage.app",
+        messagingSenderId: "340229638947",
+        appId: "1:340229638947:web:35578617c902b1d26f1a96",
+        measurementId: "G-S8878DTBRL"
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      // Loader
+      window.addEventListener('load', () => {
+        body.classList.remove('loading');
+        body.classList.add('loaded');
+      });
+
+      // Copyright year
+      const yearSpan = document.getElementById('copyright-year');
+      if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+
+      // Mobile menu
+      const hamburger = document.querySelector('.hamburger');
+      const navLinks = document.querySelector('.nav-links');
+      if (hamburger && navLinks) {
+        hamburger.addEventListener('click', () => {
+          hamburger.classList.toggle('active');
+          navLinks.classList.toggle('active');
+        });
+      }
+
+      // Love counter (both nav and footer)
+      const loveButton = document.getElementById('love-it-button');
+      const loveButtonFooter = document.getElementById('love-it-button-footer');
+      const loveCounterSpan = document.getElementById('love-counter');
+      const loveCounterFooter = document.getElementById('love-counter-footer');
+      let currentLoveCount = parseInt(localStorage.getItem('seticaLoveCount') || '0');
+      let userHasLoved = localStorage.getItem('seticaLovedState') === 'true';
+
+      function updateLoveDisplay() {
+        if (loveCounterSpan) loveCounterSpan.textContent = currentLoveCount;
+        if (loveCounterFooter) loveCounterFooter.textContent = currentLoveCount;
+        if (loveButton) loveButton.classList.toggle('loved', userHasLoved);
+        if (loveButtonFooter) loveButtonFooter.classList.toggle('loved', userHasLoved);
+      }
+
+      function handleLoveClick(button) {
+        if (!userHasLoved) {
+          currentLoveCount++;
+          localStorage.setItem('seticaLoveCount', currentLoveCount);
+          localStorage.setItem('seticaLovedState', 'true');
+          userHasLoved = true;
+          updateLoveDisplay();
+          if (typeof gsap !== 'undefined') {
+            gsap.fromTo(button.querySelector('.heart-icon'),
+              { scale: 1 },
+              { scale: 1.4, duration: 0.3, ease: 'back.out(3)', yoyo: true, repeat: 1 }
+            );
+          }
+        }
+      }
+
+      if (loveButton) {
+        updateLoveDisplay();
+        loveButton.addEventListener('click', () => handleLoveClick(loveButton));
+      }
+
+      if (loveButtonFooter) {
+        loveButtonFooter.addEventListener('click', () => handleLoveClick(loveButtonFooter));
+      }
+
+      // Nav scroll effect
+      const nav = document.querySelector('nav');
+      if (nav && typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.create({
+          start: "top top",
+          end: 99999,
+          onUpdate: (self) => nav.classList.toggle('scrolled', self.scroll() > 50)
+        });
+      }
+
+      // === WAITLIST & INTEREST LOGIC ===
+      const waitlistForm = document.getElementById('waitlist-form');
+      const messageArea = document.getElementById('form-message-area');
+      const emailInput = document.getElementById('email');
+      const interestButton = document.getElementById('interested-btn');
+      const interestCountSpan = document.getElementById('interest-count');
+      const waitlistCountSpan = document.getElementById('waitlist-count');
+
+      const userInterestedKey = 'seticaUserInterested';
+      let userHasClickedInterest = localStorage.getItem(userInterestedKey) === 'true';
+
+      // Fetch and display counts
+      async function fetchCounts() {
+        try {
+          // Get interest count
+          const interestDoc = await db.collection('stats').doc('interest').get();
+          const interestCount = interestDoc.exists ? interestDoc.data().count : 0;
+          
+          // Get waitlist count
+          const waitlistSnapshot = await db.collection('waitlist').get();
+          const waitlistCount = waitlistSnapshot.size;
+
+          // Animate counts
+          if (interestCountSpan && typeof gsap !== 'undefined') {
+            gsap.to(interestCountSpan, {
+              duration: 1,
+              innerText: interestCount,
+              roundProps: "innerText",
+              ease: "power1.out"
+            });
+          } else if (interestCountSpan) {
+            interestCountSpan.textContent = interestCount;
+          }
+
+          if (waitlistCountSpan && typeof gsap !== 'undefined') {
+            gsap.to(waitlistCountSpan, {
+              duration: 1,
+              innerText: waitlistCount,
+              roundProps: "innerText",
+              ease: "power1.out"
+            });
+          } else if (waitlistCountSpan) {
+            waitlistCountSpan.textContent = waitlistCount;
+          }
+
+          updateInterestButton();
+        } catch (error) {
+          console.error("Error fetching counts:", error);
+        }
+      }
+
+      function updateInterestButton() {
+        if (interestButton) {
+          if (userHasClickedInterest) {
+            interestButton.disabled = true;
+            interestButton.innerHTML = '<i class="fas fa-check"></i> Thanks!';
+          } else {
+            interestButton.disabled = false;
+            interestButton.innerHTML = '<i class="fas fa-heart"></i> I\'m Interested!';
+          }
+        }
+      }
+
+      // Interest button click
+      if (interestButton) {
+        interestButton.addEventListener('click', async () => {
+          if (!userHasClickedInterest) {
+            try {
+              // Increment interest count in Firestore
+              const interestRef = db.collection('stats').doc('interest');
+              await db.runTransaction(async (transaction) => {
+                const doc = await transaction.get(interestRef);
+                const newCount = (doc.exists ? doc.data().count : 0) + 1;
+                transaction.set(interestRef, { count: newCount });
+                return newCount;
+              });
+
+              userHasClickedInterest = true;
+              localStorage.setItem(userInterestedKey, 'true');
+              
+              // Refresh counts
+              await fetchCounts();
+
+              // Animation
+              if (typeof gsap !== 'undefined') {
+                gsap.fromTo(interestButton, 
+                  { scale: 1 }, 
+                  { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1 }
+                );
+                gsap.fromTo(interestCountSpan,
+                  { scale: 1 },
+                  { scale: 1.2, duration: 0.3, yoyo: true, repeat: 1, ease: 'back.out(2)' }
+                );
+              }
+            } catch (error) {
+              console.error("Error incrementing interest:", error);
+              showMessage('An error occurred. Please try again.', 'error');
+            }
+          }
+        });
+      }
+
+      // Waitlist form submission
+      if (waitlistForm && emailInput) {
+        waitlistForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const email = emailInput.value.trim().toLowerCase();
+
+          // Validate email
+          if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showMessage('Please enter a valid email address.', 'error');
+            return;
+          }
+
+          const submitButton = waitlistForm.querySelector('button[type="submit"]');
+          const originalButtonText = submitButton.innerHTML;
+          submitButton.disabled = true;
+          submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+          try {
+            // Check if email already exists
+            const existingEmail = await db.collection('waitlist')
+              .where('email', '==', email)
+              .get();
+
+            if (!existingEmail.empty) {
+              showMessage('This email is already on the waitlist!', 'error');
+              submitButton.disabled = false;
+              submitButton.innerHTML = originalButtonText;
+              return;
+            }
+
+            // Add to waitlist
+            await db.collection('waitlist').add({
+              email: email,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+              source: 'website'
+            });
+
+            showMessage('Success! You\'ve joined the waitlist. Check your email soon!', 'success');
+            emailInput.value = '';
+        
+        // Refresh counts
+        await fetchCounts();
+
+      } catch (error) {
+        console.error("Error adding to waitlist:", error);
+        showMessage('An error occurred. Please try again.', 'error');
+      } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalButtonText;
+      }
+    });
+  }
+
+  function showMessage(text, type) {
+    if (!messageArea) return;
+    
+    messageArea.textContent = text;
+    messageArea.className = `form-message ${type}`;
+    messageArea.style.display = 'block';
+
+    setTimeout(() => {
+      messageArea.style.display = 'none';
+    }, 5000);
+  }
+
+  // Initial fetch
+  fetchCounts();
+});
+  </script>
 </body>
 </html>
