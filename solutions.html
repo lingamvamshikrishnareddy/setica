@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solutions | Setica - The Everything App for Your Life</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    .loader-wrapper {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: #111; display: flex; justify-content: center;
+      align-items: center; z-index: 9999;
+      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    }
+    .loader {
+      border: 8px solid #f3f3f3; border-top: 8px solid #3498db;
+      border-radius: 50%; width: 60px; height: 60px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loaded .loader-wrapper { opacity: 0; visibility: hidden; }
+
+    /* Love Counter in Nav */
+    .love-button-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: rgba(255, 255, 255, 0.08);
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    .love-button-container:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+    .love-button-container .heart-icon {
+      color: #ff4757;
+      font-size: 1.1rem;
+      transition: transform 0.2s ease;
+    }
+    .love-button-container.loved .heart-icon {
+      transform: scale(1.2);
+    }
+    .love-button-container .love-count {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-color);
+    }
+
+    /* Enhanced Hero Section */
+    .solutions-hero {
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      padding: 120px 5% 80px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      overflow: hidden;
+    }
+
+    .solutions-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(74, 85, 255, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(255, 111, 0, 0.1) 0%, transparent 50%);
+      z-index: 0;
+    }
+
+    .solutions-hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .solutions-hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #4A55FF, #ff6f00, #4A55FF);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: gradientShift 8s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .solutions-hero p {
+      font-size: clamp(1.1rem, 2vw, 1.3rem);
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      line-height: 1.7;
+    }
+
+    .solutions-grid-section {
+      padding: 100px 5% 80px;
+      background: linear-gradient(to bottom, var(--dark-card), var(--dark-bg));
+      position: relative;
+    }
+
+    .solutions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Glassmorphism Solution Card with Animated Border */
+    .solution-card-large {
+      position: relative;
+      padding: 40px 35px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .solution-card-large::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(74, 85, 255, 0.05) 0%, rgba(255, 111, 0, 0.05) 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .solution-card-large:hover::before {
+      opacity: 1;
+    }
+
+    /* Animated Gradient Border */
+    .solution-card-large::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2px;
+      background: linear-gradient(135deg, #4A55FF, #ff6f00, #4A55FF);
+      background-size: 200% 200%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      animation: borderMove 3s linear infinite;
+    }
+
+    @keyframes borderMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .solution-card-large:hover::after {
+      opacity: 1;
+    }
+
+    .solution-card-large:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 60px rgba(74, 85, 255, 0.2);
+    }
+
+    .solution-card-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .status-tag {
+      display: inline-block;
+      align-self: flex-start;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-development {
+      background-color: rgba(74, 85, 255, 0.2);
+      color: var(--primary-color);
+    }
+
+    .status-planned {
+      background-color: rgba(255, 111, 0, 0.2);
+      color: var(--secondary-color);
+    }
+
+    .status-research {
+      background-color: rgba(0, 184, 148, 0.2);
+      color: #00b894;
+    }
+
+    .solution-icon-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 1.5rem;
+    }
+
+    .solution-icon-wrapper i {
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(74, 85, 255, 0.15), rgba(255, 111, 0, 0.15));
+      backdrop-filter: blur(10px);
+      font-size: 2rem;
+      transition: all 0.4s ease;
+      flex-shrink: 0;
+    }
+
+    .solution-card-large:hover .solution-icon-wrapper i {
+      transform: scale(1.1) rotate(5deg);
+      background: linear-gradient(135deg, rgba(74, 85, 255, 0.3), rgba(255, 111, 0, 0.3));
+      box-shadow: 0 10px 30px rgba(74, 85, 255, 0.3);
+    }
+
+    .solution-icon-wrapper i::before {
+      background: linear-gradient(135deg, #4A55FF, #ff6f00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .solution-icon-wrapper h3 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: var(--text-color);
+      font-weight: 700;
+    }
+
+    .solution-card-large p {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .features-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem 0;
+    }
+
+    .features-list li {
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .features-list li:last-child {
+      border-bottom: none;
+    }
+
+    .features-list li:hover {
+      color: var(--text-color);
+      padding-left: 5px;
+    }
+
+    .features-list li i {
+      color: #4A55FF;
+      font-size: 0.8rem;
+      min-width: 16px;
+      flex-shrink: 0;
+    }
+
+    .read-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: rgba(74, 85, 255, 0.1);
+      color: #4A55FF;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(74, 85, 255, 0.2);
+      margin-top: auto;
+      align-self: flex-start;
+    }
+
+    .read-more:hover {
+      background: rgba(74, 85, 255, 0.2);
+      border-color: rgba(74, 85, 255, 0.4);
+      transform: translateX(5px);
+      box-shadow: 0 5px 20px rgba(74, 85, 255, 0.3);
+    }
+
+    .read-more i {
+      transition: transform 0.3s ease;
+    }
+
+    .read-more:hover i {
+      transform: translateX(3px);
+    }
+
+    @media (max-width: 768px) {
+      .solutions-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+      
+      .love-button-container {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="loading">
+  <div class="loader-wrapper">
+    <div class="loader"></div>
+  </div>
+
+  <nav>
+    <div class="nav-container">
+      <div class="logo">
+        <a href="index.html"><img src="openart-image_9Aq3L7vH_1744551909797_raw.jpg" alt="Setica Logo"></a>
+      </div>
+      <div class="nav-links">
+        <a href="solutions.html" class="active">Solutions</a>
+        <a href="about.html">About</a>
+        <a href="products.html">Products</a>
+        <a href="services.html">Services</a>
+      </div>
+      <div class="love-button-container" id="love-it-button">
+        <span class="heart-icon">❤️</span>
+        <span class="love-count" id="love-counter">0</span>
+      </div>
+      <div class="cta-buttons">
+        <a href="join-waitlist.html" class="btn btn-primary">Join Waitlist</a>
+      </div>
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <header class="solutions-hero">
+    <div class="solutions-hero-content">
+      <h1>Our Solutions</h1>
+      <p>Discover how Setica integrates multiple technologies to simplify every aspect of your life.</p>
+    </div>
+  </header>
+
+  <section class="solutions-grid-section">
+    <div class="section-header" style="margin-bottom: 50px; text-align: center;">
+      <h2>Integrated Solutions for Modern Life</h2>
+      <p style="max-width: 700px; margin: 0 auto; color: var(--text-muted);">Each solution is designed to work seamlessly within the Setica ecosystem, providing a cohesive experience.</p>
+    </div>
+
+    <div class="solutions-grid">
+      <!-- Solution Card 1: Telehealth -->
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-development">In Development</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-briefcase-medical"></i>
+            <h3>Telehealth Platform</h3>
+          </div>
+          <p>Connect with healthcare providers, schedule appointments, and manage your health records - all in one secure location.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Virtual doctor consultations with verified specialists</li>
+            <li><i class="fas fa-check-circle"></i> Secure medical record access and sharing</li>
+            <li><i class="fas fa-check-circle"></i> Automated appointment reminders & follow-ups</li>
+            <li><i class="fas fa-check-circle"></i> Prescription management and refill requests</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Solution Card 2: Jobs Platform -->
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-development">In Development</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-hard-hat"></i>
+            <h3>Jobs Platform</h3>
+          </div>
+          <p>Find opportunities that match your skills, connect with employers, and manage your professional development path efficiently.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> AI-powered job matching based on skills & experience</li>
+            <li><i class="fas fa-check-circle"></i> Professional profile builder with portfolio integration</li>
+            <li><i class="fas fa-check-circle"></i> Direct messaging with hiring managers</li>
+            <li><i class="fas fa-check-circle"></i> Career path planning and skill gap analysis</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Solution Card 3: Health & Fitness -->
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-development">In Development</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-heartbeat"></i>
+            <h3>Health & Fitness</h3>
+          </div>
+          <p>Track your nutrition, plan workouts, and monitor your progress with personalized health insights and recommendations.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Personalized nutrition tracking and meal planning</li>
+            <li><i class="fas fa-check-circle"></i> Adaptive workout routines tailored to your goals</li>
+            <li><i class="fas fa-check-circle"></i> Progress tracking with visual analytics & reports</li>
+            <li><i class="fas fa-check-circle"></i> Integration with popular wearable devices</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Solution Card 4: Safety Tools -->
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-planned">Planned</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Safety Tools</h3>
+          </div>
+          <p>Enhance your personal security with location sharing, emergency contacts, and community safety features.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Real-time location sharing with trusted contacts</li>
+            <li><i class="fas fa-check-circle"></i> One-tap emergency alert system (SOS)</li>
+            <li><i class="fas fa-check-circle"></i> Localized community safety notifications</li>
+            <li><i class="fas fa-check-circle"></i> Automated journey monitoring for travel safety</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Solution Card 5: Quick Commerce -->
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-planned">Planned</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-shipping-fast"></i>
+            <h3>Quick Commerce</h3>
+          </div>
+          <p>Order everyday essentials with rapid local delivery, supporting neighborhood businesses while getting what you need fast.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Sub-30 minute delivery from local stores</li>
+            <li><i class="fas fa-check-circle"></i> Curated local business discovery & support</li>
+            <li><i class="fas fa-check-circle"></i> Smart scheduling for recurring deliveries</li>
+            <li><i class="fas fa-check-circle"></i> Real-time order tracking & communication</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Solution Card 6: Fintech Tools -->
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-coins"></i>
+            <h3>Fintech Tools</h3>
+          </div>
+          <p>Manage your finances with modern tools for budgeting, seamless payments, and personalized financial wellness insights.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Automated expense tracking and smart budgeting</li>
+            <li><i class="fas fa-check-circle"></i> Secure & instant peer-to-peer payments</li>
+            <li><i class="fas fa-check-circle"></i> Financial health scoring and actionable advice</li>
+            <li><i class="fas fa-check-circle"></i> Goal-based savings automation & tracking</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Solution Card 7: Event Management -->
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-calendar-alt"></i>
+            <h3>Event Management</h3>
+          </div>
+          <p>Organize personal gatherings or discover local events, manage RSVPs, and connect with attendees seamlessly.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Easy event creation and invitation management</li>
+            <li><i class="fas fa-check-circle"></i> Integrated calendar syncing and reminders</li>
+            <li><i class="fas fa-check-circle"></i> Local event discovery based on interests</li>
+            <li><i class="fas fa-check-circle"></i> Group chat and photo sharing for attendees</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Additional Solution Cards -->
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-tractor"></i>
+            <h3>FarmiCart</h3>
+          </div>
+          <p>Direct B2B and retail marketplace connecting farmers with better pricing, eliminating middlemen for fair agricultural trade.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Fair pricing mechanisms for farmers</li>
+            <li><i class="fas fa-check-circle"></i> B2B & retail connections</li>
+            <li><i class="fas fa-check-circle"></i> Direct farm-to-consumer delivery</li>
+            <li><i class="fas fa-check-circle"></i> Quality certification & tracking</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-table"></i>
+            <h3>Excel Kitab</h3>
+          </div>
+          <p>Online collaborative spreadsheet platform with advanced data analysis, real-time collaboration, and cloud-based storage.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Real-time multi-user collaboration</li>
+            <li><i class="fas fa-check-circle"></i> Advanced formulas & functions</li>
+            <li><i class="fas fa-check-circle"></i> Cloud-based secure storage</li>
+            <li><i class="fas fa-check-circle"></i> Data visualization & charting tools</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-baby"></i>
+            <h3>Baby ScreenRant Killer</h3>
+          </div>
+          <p>Comprehensive parenting app for babies aged 1-5 with nutrition tracking, habit building, memory preservation, developmental checklists, and age-appropriate skill training.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Nutrition & meal planning tracker</li>
+            <li><i class="fas fa-check-circle"></i> Habit building & routine management</li>
+            <li><i class="fas fa-check-circle"></i> Memory preservation & milestones</li>
+            <li><i class="fas fa-check-circle"></i> Developmental skill training modules</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-laugh"></i>
+            <h3>Nexora</h3>
+          </div>
+          <p>Entertainment platform for viral memes, movie shorts, and trending content discovery with creator monetization features.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Curated viral meme library</li>
+            <li><i class="fas fa-check-circle"></i> Movie shorts & highlight clips</li>
+            <li><i class="fas fa-check-circle"></i> Trending content discovery feed</li>
+            <li><i class="fas fa-check-circle"></i> Creator monetization platform</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-video"></i>
+            <h3>Pixel Stream</h3>
+          </div>
+          <p>OTT platform dedicated to short films, comedy content, emerging directors, and opera performance streaming.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Short film showcase & discovery</li>
+            <li><i class="fas fa-check-circle"></i> Comedy content library</li>
+            <li><i class="fas fa-check-circle"></i> Emerging director spotlight</li>
+            <li><i class="fas fa-check-circle"></i> Live opera performance streaming</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-planned">Planned</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-plane-departure"></i>
+            <h3>Yatra - Travel & Hospitality</h3>
+          </div>
+          <p>Complete travel and hospitality platform featuring budget stays, spiritual travel planning, honeymoon packages, and AI-powered itinerary creation with transparent pricing.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Budget stay search (₹99-₹499) — verified hostels, dharamshalas, low-cost hotels</li>
+            <li><i class="fas fa-check-circle"></i> Spiritual Travel Mode — pilgrimage planning, temple routes, e-darshan, prasad delivery</li>
+            <li><i class="fas fa-check-circle"></i> Honeymoon Explorer — romantic destinations, local photographers, candlelight experiences</li>
+            <li><i class="fas fa-check-circle"></i> Budget Global Packages — off-season Europe/SEA trips with EMI options</li>
+            <li><i class="fas fa-check-circle"></i> Fixed-price Promise — total cost upfront with no hidden fees</li>
+            <li><i class="fas fa-check-circle"></i> Gamified Rewards — earn coins/discounts for check-ins, reviews, referrals</li>
+            <li><i class="fas fa-check-circle"></i> AI Travel Assistant — personalized itinerary planning with budget optimization</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-rocket"></i>
+            <h3>Startup Fundraising CRM</h3>
+          </div>
+          <p>Comprehensive CRM for startups to manage investor relations, pitch tracking, fundraising pipelines, and cap table management.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Investor database & relationship management</li>
+            <li><i class="fas fa-check-circle"></i> Pitch deck version tracking</li>
+            <li><i class="fas fa-check-circle"></i> Fundraising pipeline visualization</li>
+            <li><i class="fas fa-check-circle"></i> Cap table & equity management</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-broadcast-tower"></i>
+            <h3>WaveLink</h3>
+          </div>
+          <p>Video communication platform with integrated Persona AI agent for enhanced meetings, collaboration, and productivity.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> HD video conferencing & calls</li>
+            <li><i class="fas fa-check-circle"></i> Persona AI meeting assistant</li>
+            <li><i class="fas fa-check-circle"></i> Auto meeting transcription & notes</li>
+            <li><i class="fas fa-check-circle"></i> Screen sharing & session recording</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="solution-card-large">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-apple-alt"></i>
+            <h3>Nutrition Buddy</h3>
+          </div>
+          <p>AI-powered meal planning and nutrition tracking with personalized recommendations and smart recipe suggestions.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Smart meal planning & prep</li>
+            <li><i class="fas fa-check-circle"></i> Calorie & macro nutrient tracking</li>
+            <li><i class="fas fa-check-circle"></i> AI-powered recipe suggestions</li>
+            <li><i class="fas fa-check-circle"></i> Dietary goal monitoring & insights</li>
+          </ul>
+          <a href="#" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="cta" class="cta-section">
+    <div class="overlay"></div>
+    <div class="cta-content">
+      <h2>Explore the Possibilities Further</h2>
+      <p>Join the waitlist to stay updated on our progress and be among the first to experience Setica.</p>
+      <a href="join-waitlist.html" class="btn btn-cta">JOIN WAITLIST →</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-left">
+        <img src="https://via.placeholder.com/120x40?text=Setica" alt="Setica Logo">
+        <p>Copyright © <span id="copyright-year">2024</span> Setica.<br>All rights reserved.</p>
+        <p style="margin-top: 15px; font-size: 0.8rem;">An open-source initiative.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-column">
+          <h3>Platform</h3>
+          <ul>
+            <li><a href="solutions.html">Solutions</a></li>
+            <li><a href="products.html">Product Roadmap</a></li>
+            <li><a href="about.html">About Setica</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+            <li><a href="#">Documentation (Upcoming)</a></li>
+            <li><a href="#">API Reference (Upcoming)</a></li>
+            <li><a href="#">Contribution Guide</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="#">Careers (Coming Soon)</a></li>
+            <li><a href="mailto:lingamvamshikrishnareddy@gmail.com">Contact</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-social">
+        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        <a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>Made with <i class="fas fa-heart heart-icon"></i> and Open Source principles. Site developed with assistance from Claude.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const body = document.body;
+
+      // Loader
+      window.addEventListener('load', () => {
+        body.classList.remove('loading');
+        body.classList.add('loaded');
+      });
+      body.classList.add('loading');
+
+      // Copyright Year
+      const yearSpan = document.getElementById('copyright-year');
+      if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+      }
+
+      // Mobile Menu
+      const hamburger = document.querySelector('.hamburger');
+      const mobileMenu = document.querySelector('.nav-links');
+      if (hamburger && mobileMenu) {
+        hamburger.addEventListener('click', () => {
+          hamburger.classList.toggle('active');
+          mobileMenu.classList.toggle('active');
+        });
+      }
+
+      // Love Counter
+      const loveButton = document.getElementById('love-it-button');
+      const loveCounterSpan = document.getElementById('love-counter');
+      const localStorageKey = 'seticaLoveCount';
+      const lovedStateKey = 'seticaLovedState';
+      let currentLoveCount = parseInt(localStorage.getItem(localStorageKey) || '0');
+      let userHasLoved = localStorage.getItem(lovedStateKey) === 'true';
+
+      function updateLoveDisplay() {
+        if(loveCounterSpan) loveCounterSpan.textContent = currentLoveCount;
+        if(loveButton) {
+          if(userHasLoved) loveButton.classList.add('loved');
+          else loveButton.classList.remove('loved');
+        }
+      }
+
+      if (loveButton && loveCounterSpan) {
+        updateLoveDisplay();
+        loveButton.addEventListener('click', () => {
+          if (!userHasLoved) {
+            currentLoveCount++;
+            userHasLoved = true;
+            localStorage.setItem(localStorageKey, currentLoveCount);
+            localStorage.setItem(lovedStateKey, 'true');
+            updateLoveDisplay();
+            if (typeof gsap !== 'undefined') {
+              gsap.fromTo(loveButton.querySelector('.heart-icon'),
+                { scale: 1 },
+                { scale: 1.4, duration: 0.3, ease: 'back.out(3)', yoyo: true, repeat: 1 }
+              );
+            }
+          } else {
+            if (typeof gsap !== 'undefined') {
+              gsap.fromTo(loveButton,
+                {x: 0},
+                {x: 5, duration:0.1, repeat: 3, yoyo: true, clearProps: "x"}
+              );
+            }
+          }
+        });
+      }
+
+      // Nav Scroll Effect
+      const nav = document.querySelector('nav');
+      if (nav && typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.create({
+          start: "top top",
+          end: 99999,
+          onUpdate: (self) => {
+            if (self.scroll() > 50) {
+              nav.classList.add('scrolled');
+            } else {
+              nav.classList.remove('scrolled');
+            }
+          }
+        });
+      }
+
+      // GSAP Animations
+      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        // Animate Solution Cards
+        gsap.utils.toArray('.solution-card-large').forEach((card, index) => {
+          gsap.from(card, {
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              end: "bottom 15%",
+              toggleActions: "play none none reverse"
+            },
+            opacity: 0,
+            y: 60,
+            duration: 0.7,
+            ease: "power2.out",
+            delay: index * 0.1
+          });
+        });
+
+        // Hero Animation
+        gsap.from('.solutions-hero-content h1', {
+          opacity: 0,
+          y: 50,
+          duration: 1,
+          ease: "power3.out",
+          delay: 0.3
+        });
+
+        gsap.from('.solutions-hero-content p', {
+          opacity: 0,
+          y: 30,
+          duration: 0.8,
+          ease: "power2.out",
+          delay: 0.6
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>

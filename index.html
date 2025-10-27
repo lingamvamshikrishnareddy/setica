@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setica - The Everything App for Your Life</title>
+  
+  <meta name="description" content="Setica is an open-source platform designed as an all-in-one solution for your life. Streamline your daily tasks with our integrated ecosystem of apps.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --dark-bg: #0F0F1A;
+      --dark-card: #1a1a2e;
+      --text-color: #E0E0FF;
+      --text-muted: rgba(224, 224, 255, 0.7);
+      --primary-blue: #4A55FF;
+      --primary-orange: #ff6f00;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: var(--dark-bg);
+      color: var(--text-color);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Loader */
+    .loader-wrapper {
+      position: fixed;
+      inset: 0;
+      background-color: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    }
+    
+    .loader {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #3498db;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    body.loaded .loader-wrapper {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      padding: 20px 0;
+      background-color: transparent;
+      transition: all 0.3s ease;
+    }
+
+    nav.scrolled {
+      background-color: rgba(15, 15, 26, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 15px 0;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .logo img {
+      height: 35px;
+      width: auto;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--primary-blue);
+    }
+
+    .love-button-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .love-button-container:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(1.05);
+    }
+
+    .heart-icon {
+      font-size: 1.2rem;
+    }
+
+    .love-count {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-block;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+      color: white;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(74, 85, 255, 0.3);
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: var(--text-color);
+      transition: all 0.3s ease;
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      padding: 120px 5% 80px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(74, 85, 255, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(255, 111, 0, 0.1) 0%, transparent 50%);
+      z-index: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 7vw, 4.5rem);
+      margin-bottom: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #4A55FF, #ff6f00, #4A55FF);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: gradientShift 8s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero p {
+      font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 700px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.8);
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .scroll-indicator p {
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+
+    .scroll-indicator i {
+      font-size: 1.5rem;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    /* Solutions Grid Section */
+    .solutions-section {
+      padding: 100px 5%;
+      background: linear-gradient(to bottom, var(--dark-card), var(--dark-bg));
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto 60px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(2rem, 4vw, 2.5rem);
+      margin-bottom: 1rem;
+      color: var(--text-color);
+    }
+
+    .section-header p {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    .solutions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Solution Card with Animated Border */
+    .solution-card {
+      position: relative;
+      padding: 35px 30px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      overflow: hidden;
+    }
+
+    .solution-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(74, 85, 255, 0.05) 0%, rgba(255, 111, 0, 0.05) 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 0;
+    }
+
+    .solution-card:hover::before {
+      opacity: 1;
+    }
+
+    /* Animated Snake Border */
+    .solution-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2px;
+      background: linear-gradient(135deg, #4A55FF, #ff6f00, #4A55FF);
+      background-size: 300% 300%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      animation: borderSnake 4s linear infinite;
+    }
+
+    @keyframes borderSnake {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .solution-card:hover::after {
+      opacity: 1;
+    }
+
+    .solution-card:hover {
+      transform: translateY(-8px);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 60px rgba(74, 85, 255, 0.2);
+    }
+
+    .solution-card-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .status-tag {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-development {
+      background: rgba(74, 85, 255, 0.2);
+      color: #4A55FF;
+    }
+
+    .status-planned {
+      background: rgba(255, 193, 7, 0.2);
+      color: #FFC107;
+    }
+
+    .status-research {
+      background: rgba(156, 39, 176, 0.2);
+      color: #CE93D8;
+    }
+
+    .solution-icon-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .solution-icon-wrapper i {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, #4A55FF, #ff6f00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      transition: transform 0.3s ease;
+    }
+
+    .solution-card:hover .solution-icon-wrapper i {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .solution-icon-wrapper h3 {
+      font-size: 1.3rem;
+      color: var(--text-color);
+      font-weight: 700;
+    }
+
+    .solution-card p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .features-list {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+
+    .features-list li {
+      padding: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+
+    .features-list li:hover {
+      color: var(--text-color);
+      padding-left: 5px;
+    }
+
+    .features-list li i {
+      color: var(--primary-blue);
+      font-size: 0.7rem;
+    }
+
+    .read-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary-blue);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .read-more:hover {
+      gap: 12px;
+      color: var(--primary-orange);
+    }
+
+    .read-more i {
+      transition: transform 0.3s ease;
+    }
+
+    .read-more:hover i {
+      transform: translateX(3px);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      position: relative;
+      padding: 100px 5%;
+      text-align: center;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(74, 85, 255, 0.1), transparent);
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .cta-content h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 1rem;
+      color: var(--text-color);
+    }
+
+    .cta-content p {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .btn-cta {
+      padding: 16px 40px;
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .btn-cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(74, 85, 255, 0.4);
+    }
+
+    /* Footer */
+    footer {
+      background: #0a0a15;
+      padding: 60px 5% 30px;
+      color: var(--text-muted);
+    }
+
+    .footer-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-left img {
+      height: 35px;
+      margin-bottom: 20px;
+    }
+
+    .footer-column h3 {
+      color: var(--text-color);
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+
+    .footer-column ul {
+      list-style: none;
+    }
+
+    .footer-column ul li {
+      margin-bottom: 10px;
+    }
+
+    .footer-column ul li a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-column ul li a:hover {
+      color: var(--primary-blue);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .footer-social a {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      color: var(--text-color);
+      transition: all 0.3s ease;
+    }
+
+    .footer-social a:hover {
+      background: var(--primary-blue);
+      transform: translateY(-3px);
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .heart-icon {
+      color: #ff6f00;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .footer-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: rgba(15, 15, 26, 0.98);
+        backdrop-filter: blur(10px);
+        flex-direction: column;
+        padding: 40px;
+        transition: left 0.3s ease;
+      }
+
+      .nav-links.active {
+        left: 0;
+      }
+
+      .cta-buttons {
+        display: none;
+      }
+
+      .solutions-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+      }
+
+      .footer-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader-wrapper">
+    <div class="loader"></div>
+  </div>
+
+  <nav>
+    <div class="nav-container">
+      <div class="logo">
+        <a href="index.html"><img src="./images/setica-preview.jpg" alt="Setica Logo"></a>
+      </div>
+      <div class="nav-links">
+        <a href="solutions.html">Solutions</a>
+        <a href="about.html">About</a>
+        <a href="products.html">Products</a>
+        <a href="services.html">Services</a>
+      </div>
+      <div class="love-button-container" id="love-it-button">
+        <span class="heart-icon">❤️</span>
+        <span class="love-count" id="love-counter">0</span>
+      </div>
+      <div class="cta-buttons">
+        <a href="join-waitlist.html" class="btn btn-primary">Join Waitlist</a>
+      </div>
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-content">
+      <h1>Setica: Simplify Your Life</h1>
+      <p>An open-source platform designed as an all-in-one solution for your life. Technology that makes life easier—coming soon.</p>
+      <a href="join-waitlist.html" class="btn btn-primary">Join Waitlist</a>
+    </div>
+    <div class="scroll-indicator">
+      <p>SCROLL TO EXPLORE</p>
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </header>
+
+  <section class="solutions-section">
+    <div class="section-header">
+      <h2>Featured Solutions & Product Roadmap</h2>
+      <p>Explore Setica's comprehensive ecosystem of integrated solutions currently in development or planned for future releases.</p>
+    </div>
+
+    <div class="solutions-grid">
+      <!-- Telehealth Platform -->
+      <div class="solution-card">
+        <div class="solution-card-content">
+          <span class="status-tag status-development">In Development</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-briefcase-medical"></i>
+            <h3>Telehealth Platform</h3>
+          </div>
+          <p>Connect with healthcare providers, schedule appointments, and manage your health records - all in one secure location.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Virtual doctor consultations</li>
+            <li><i class="fas fa-check-circle"></i> Secure medical record access</li>
+            <li><i class="fas fa-check-circle"></i> Ambulance service connectivity</li>
+            <li><i class="fas fa-check-circle"></i> Prescription management</li>
+          </ul>
+          <a href="products.html" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Blue Collar Jobs -->
+      <div class="solution-card">
+        <div class="solution-card-content">
+          <span class="status-tag status-development">In Development</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-hard-hat"></i>
+            <h3>Blue Collar Jobs Platform</h3>
+          </div>
+          <p>A dedicated platform connecting skilled workers with relevant opportunities, designed specifically for the underserved blue-collar segment.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> AI-powered job matching</li>
+            <li><i class="fas fa-check-circle"></i> Skill verification tracking</li>
+            <li><i class="fas fa-check-circle"></i> Direct messaging</li>
+            <li><i class="fas fa-check-circle"></i> Career resources</li>
+          </ul>
+          <a href="products.html" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Health & Fitness -->
+      <div class="solution-card">
+        <div class="solution-card-content">
+          <span class="status-tag status-development">In Development</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-heartbeat"></i>
+            <h3>Health & Fitness App</h3>
+          </div>
+          <p>Track your nutrition, plan workouts, and monitor your progress with personalized health insights.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Personalized nutrition tracking</li>
+            <li><i class="fas fa-check-circle"></i> Adaptive workout routines</li>
+            <li><i class="fas fa-check-circle"></i> Progress tracking & reports</li>
+            <li><i class="fas fa-check-circle"></i> Wearable device integration</li>
+          </ul>
+          <a href="products.html" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Women's Safety -->
+      <div class="solution-card">
+        <div class="solution-card-content">
+          <span class="status-tag status-development">In Development</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Women's Safety Tools</h3>
+          </div>
+          <p>Enhance personal security with location sharing, emergency contacts, and community safety features.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Real-time location sharing</li>
+            <li><i class="fas fa-check-circle"></i> One-tap emergency alert (SOS)</li>
+            <li><i class="fas fa-check-circle"></i> Institutional safety partnerships</li>
+            <li><i class="fas fa-check-circle"></i> Automated journey monitoring</li>
+          </ul>
+          <a href="products.html" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- SetCart Quick Commerce -->
+      <div class="solution-card">
+        <div class="solution-card-content">
+          <span class="status-tag status-planned">Planned</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-shipping-fast"></i>
+            <h3>SetCart Quick Commerce</h3>
+          </div>
+          <p>Transparent quick commerce with zero dark patterns, connecting users with local stores for rapid delivery.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> 100% transparent pricing</li>
+            <li><i class="fas fa-check-circle"></i> Sub-30 min local delivery</li>
+            <li><i class="fas fa-check-circle"></i> No hidden fees or tricks</li>
+            <li><i class="fas fa-check-circle"></i> Support local businesses</li>
+          </ul>
+          <a href="products.html" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Vayu Ride Sharing -->
+      <div class="solution-card">
+        <div class="solution-card-content">
+          <span class="status-tag status-planned">Planned</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-car"></i>
+            <h3>Vayu Ride Sharing</h3>
+          </div>
+          <p>Connected transportation service optimizing urban mobility with focus on affordability and efficiency.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Real-time ride matching</li>
+            <li><i class="fas fa-check-circle"></i> Driver verification & safety</li>
+            <li><i class="fas fa-check-circle"></i> Multiple transport options</li>
+            <li><i class="fas fa-check-circle"></i> Loyalty & rewards system</li>
+          </ul>
+          <a href="products.html" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Enterprise Management -->
+      <div class="solution-card">
+        <div class="solution-card-content">
+          <span class="status-tag status-planned">Planned</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-cogs"></i>
+            <h3>Enterprise Management SaaS</h3>
+          </div>
+          <p>Complete business OS with CRM, project management, and workflow automation. Alternative to Zoho and Salesforce.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Unified CRM platform</li>
+            <li><i class="fas fa-check-circle"></i> Project management tools</li>
+            <li><i class="fas fa-check-circle"></i> Workflow automation</li>
+            <li><i class="fas fa-check-circle"></i> Team collaboration</li>
+          </ul>
+          <a href="products.html" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Yatra Travel -->
+      <div class="solution-card">
+        <div class="solution-card-content">
+          <span class="status-tag status-planned">Planned</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-plane-departure"></i>
+            <h3>Yatra - Travel & Hospitality</h3>
+          </div>
+          <p>Complete travel platform with budget stays, spiritual travel, honeymoon packages, and AI itinerary planning.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Budget stays (₹99-₹499)</li>
+            <li><i class="fas fa-check-circle"></i> Spiritual travel mode</li>
+            <li><i class="fas fa-check-circle"></i> AI Travel Assistant</li>
+            <li><i class="fas fa-check-circle"></i> Gamified rewards system</li>
+          </ul>
+          <a href="products.html" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Fintech Solution -->
+      <div class="solution-card">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-coins"></i>
+            <h3>Fintech Solution</h3>
+          </div>
+          <p>Manage your finances with modern tools for budgeting, seamless payments, and financial wellness insights.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Automated expense tracking</li>
+            <li><i class="fas fa-check-circle"></i> Secure P2P payments</li>
+            <li><i class="fas fa-check-circle"></i> Financial health scoring</li>
+            <li><i class="fas fa-check-circle"></i> Goal-based savings tracking</li>
+          </ul>
+          <a href="products.html" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- AI Job Application Agent -->
+      <div class="solution-card">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-robot"></i>
+            <h3>AI Job Application Agent</h3>
+          </div>
+          <p>Automated job searching and application with AI-powered resume optimization.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Auto job search & apply</li>
+            <li><i class="fas fa-check-circle"></i> Resume optimization</li>
+            <li><i class="fas fa-check-circle"></i> Interview preparation</li>
+            <li><i class="fas fa-check-circle"></i> Application tracking</li>
+          </ul>
+          <a href="products.html" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Cyber Shield -->
+      <div class="solution-card">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-user-shield"></i>
+            <h3>Cyber Shield</h3>
+          </div>
+          <p>Comprehensive cybersecurity platform for personal and business protection.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Real-time threat monitoring</li>
+            <li><i class="fas fa-check-circle"></i> Identity protection</li>
+            <li><i class="fas fa-check-circle"></i> Secure browsing & VPN</li>
+            <li><i class="fas fa-check-circle"></i> Data encryption tools</li>
+          </ul>
+          <a href="products.html" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Kalam EV Vehicle -->
+      <div class="solution-card">
+        <div class="solution-card-content">
+          <span class="status-tag status-research">Research</span>
+          <div class="solution-icon-wrapper">
+            <i class="fas fa-charging-station"></i>
+            <h3>Kalam EV Vehicle</h3>
+          </div>
+          <p>Quad-motor electric vehicle with specialized lithium battery cells for unmatched reliability.</p>
+          <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> 4-motor redundancy</li>
+            <li><i class="fas fa-check-circle"></i> Advanced battery tech</li>
+            <li><i class="fas fa-check-circle"></i> Smart connectivity</li>
+            <li><i class="fas fa-check-circle"></i> Sustainable design</li>
+          </ul>
+          <a href="products.html" class="read-more">Learn more <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 60px;">
+      <a href="products.html" class="btn btn-primary" style="margin-right: 15px;">View Complete Roadmap (40+ Products)</a>
+      <a href="services.html" class="btn btn-primary">Explore Our Services</a>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-content">
+      <h2>Ready to Simplify Your Life?</h2>
+      <p>Join the waitlist and be the first to experience the unified Setica platform.</p>
+      <a href="join-waitlist.html" class="btn-cta">JOIN WAITLIST →</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-left">
+        <img src="./images/setica-preview.jpg" alt="Setica Logo">
+        <p>Copyright © <span id="copyright-year">2024</span> Setica.<br>All rights reserved.</p>
+        <p style="margin-top: 15px; font-size: 0.8rem;">An open-source initiative.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+          <a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-column">
+        <h3>Platform</h3>
+        <ul>
+          <li><a href="solutions.html">Solutions</a></li>
+          <li><a href="products.html">Product Roadmap</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="about.html">About Setica</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Resources</h3>
+        <ul>
+          <li><a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+          <li><a href="#">Documentation (Upcoming)</a></li>
+          <li><a href="#">API Reference (Upcoming)</a></li>
+          <li><a href="#">Contribution Guide</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Company</h3>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="#">Careers (Coming Soon)</a></li>
+          <li><a href="mailto:lingamvamshikrishnareddy@gmail.com">Contact</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>Made with <i class="fas fa-heart heart-icon"></i> and Open Source principles. Site developed with assistance from Claude.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const body = document.body;
+      
+      // Loader
+      window.addEventListener('load', () => {
+        body.classList.add('loaded');
+      });
+
+      // Copyright Year
+      const yearSpan = document.getElementById('copyright-year');
+      if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+      }
+
+      // Mobile Menu
+      const hamburger = document.querySelector('.hamburger');
+      const navLinks = document.querySelector('.nav-links');
+      if (hamburger && navLinks) {
+        hamburger.addEventListener('click', () => {
+          hamburger.classList.toggle('active');
+          navLinks.classList.toggle('active');
+        });
+      }
+
+      // Love Counter
+      const loveButton = document.getElementById('love-it-button');
+      const loveCounterSpan = document.getElementById('love-counter');
+      let currentLoveCount = parseInt(localStorage.getItem('seticaLoveCount') || '0');
+      let userHasLoved = localStorage.getItem('seticaLovedState') === 'true';
+      
+      function updateLoveDisplay() {
+        if (loveCounterSpan) loveCounterSpan.textContent = currentLoveCount;
+        if (loveButton) {
+          if (userHasLoved) loveButton.style.background = 'rgba(255, 111, 0, 0.2)';
+          else loveButton.style.background = 'rgba(255, 255, 255, 0.05)';
+        }
+      }
+      
+      if (loveButton && loveCounterSpan) {
+        updateLoveDisplay();
+        loveButton.addEventListener('click', () => {
+          if (!userHasLoved) {
+            currentLoveCount++;
+            userHasLoved = true;
+            localStorage.setItem('seticaLoveCount', currentLoveCount);
+            localStorage.setItem('seticaLovedState', 'true');
+            updateLoveDisplay();
+            
+            // Animation
+            loveButton.querySelector('.heart-icon').style.transform = 'scale(1.4)';
+            setTimeout(() => {
+              loveButton.querySelector('.heart-icon').style.transform = 'scale(1)';
+            }, 300);
+          }
+        });
+      }
+
+      // Nav Scroll Effect
+      const nav = document.querySelector('nav');
+      if (nav) {
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 50) {
+            nav.classList.add('scrolled');
+          } else {
+            nav.classList.remove('scrolled');
+          }
+        });
+      }
+
+      // Smooth scroll for scroll indicator
+      const scrollIndicator = document.querySelector('.scroll-indicator');
+      if (scrollIndicator) {
+        scrollIndicator.addEventListener('click', () => {
+          const solutionsSection = document.querySelector('.solutions-section');
+          if (solutionsSection) {
+            solutionsSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      }
+
+      // GSAP Animations
+      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Animate Solution Cards
+        gsap.utils.toArray('.solution-card').forEach((card, index) => {
+          gsap.from(card, {
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              end: "bottom 15%",
+              toggleActions: "play none none reverse"
+            },
+            opacity: 0,
+            y: 60,
+            duration: 0.7,
+            ease: "power2.out",
+            delay: index * 0.05
+          });
+        });
+
+        // Hero Animation
+        gsap.from('.hero-content h1', {
+          opacity: 0,
+          y: 50,
+          duration: 1,
+          ease: "power3.out",
+          delay: 0.3
+        });
+
+        gsap.from('.hero-content p', {
+          opacity: 0,
+          y: 30,
+          duration: 0.8,
+          ease: "power2.out",
+          delay: 0.6
+        });
+
+        gsap.from('.hero-content .btn', {
+          opacity: 0,
+          y: 20,
+          duration: 0.6,
+          ease: "power2.out",
+          delay: 0.9
+        });
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services | Setica - Premium Development & AI Solutions</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    .loader-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #111; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease-out, visibility 0.5s ease-out; }
+    .loader { border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loaded .loader-wrapper { opacity: 0; visibility: hidden; }
+
+    /* Page Header */
+    .services-hero {
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      padding: 120px 5% 80px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      overflow: hidden;
+    }
+
+    .services-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(74, 85, 255, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(255, 111, 0, 0.1) 0%, transparent 50%);
+      z-index: 0;
+    }
+
+    .services-hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .services-hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #4A55FF, #ff6f00, #4A55FF);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: gradientShift 8s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .services-hero p {
+      font-size: clamp(1.1rem, 2vw, 1.3rem);
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      line-height: 1.7;
+    }
+
+    /* Services Section */
+    .services-section {
+      padding: 100px 5%;
+      background: linear-gradient(to bottom, var(--dark-card), var(--dark-bg));
+      position: relative;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Glassmorphism Service Card */
+    .service-card {
+      position: relative;
+      padding: 40px 35px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(74, 85, 255, 0.05) 0%, rgba(255, 111, 0, 0.05) 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .service-card:hover::before {
+      opacity: 1;
+    }
+
+    /* Animated Border */
+    .service-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2px;
+      background: linear-gradient(135deg, #4A55FF, #ff6f00, #4A55FF);
+      background-size: 200% 200%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      animation: borderMove 3s linear infinite;
+    }
+
+    @keyframes borderMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .service-card:hover::after {
+      opacity: 1;
+    }
+
+    .service-card:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 60px rgba(74, 85, 255, 0.2);
+    }
+
+    .service-card-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .service-icon {
+      width: 70px;
+      height: 70px;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(74, 85, 255, 0.15), rgba(255, 111, 0, 0.15));
+      backdrop-filter: blur(10px);
+      transition: all 0.4s ease;
+    }
+
+    .service-card:hover .service-icon {
+      transform: scale(1.1) rotate(5deg);
+      background: linear-gradient(135deg, rgba(74, 85, 255, 0.3), rgba(255, 111, 0, 0.3));
+      box-shadow: 0 10px 30px rgba(74, 85, 255, 0.3);
+    }
+
+    .service-icon i {
+      font-size: 2rem;
+      background: linear-gradient(135deg, #4A55FF, #ff6f00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .service-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: var(--text-color);
+      font-weight: 700;
+    }
+
+    .service-card p {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 25px;
+    }
+
+    .service-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 25px 0;
+    }
+
+    .service-features li {
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .service-features li:last-child {
+      border-bottom: none;
+    }
+
+    .service-features li:hover {
+      color: var(--text-color);
+      padding-left: 5px;
+    }
+
+    .service-features li i {
+      color: #4A55FF;
+      font-size: 0.8rem;
+      min-width: 16px;
+    }
+
+    .service-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: rgba(74, 85, 255, 0.1);
+      color: #4A55FF;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(74, 85, 255, 0.2);
+    }
+
+    .service-cta:hover {
+      background: rgba(74, 85, 255, 0.2);
+      border-color: rgba(74, 85, 255, 0.4);
+      transform: translateX(5px);
+      box-shadow: 0 5px 20px rgba(74, 85, 255, 0.3);
+    }
+
+    .service-cta i {
+      transition: transform 0.3s ease;
+    }
+
+    .service-cta:hover i {
+      transform: translateX(3px);
+    }
+
+    /* Tech Stack Section */
+    .tech-stack-section {
+      padding: 80px 5%;
+      background: var(--dark-bg);
+      text-align: center;
+    }
+
+    .tech-stack-section h2 {
+      margin-bottom: 20px;
+      color: var(--text-color);
+    }
+
+    .tech-stack-section p {
+      max-width: 700px;
+      margin: 0 auto 50px;
+      color: var(--text-muted);
+    }
+
+    .tech-logos {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .tech-logo {
+      padding: 20px 30px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tech-logo:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(74, 85, 255, 0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(74, 85, 255, 0.2);
+    }
+
+    .tech-logo i {
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, #4A55FF, #ff6f00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .tech-logo span {
+      font-weight: 600;
+      color: var(--text-color);
+      font-size: 0.95rem;
+    }
+
+    /* Process Section */
+    .process-section {
+      padding: 80px 5%;
+      background: linear-gradient(to bottom, var(--dark-bg), var(--dark-card));
+    }
+
+    .process-section h2 {
+      text-align: center;
+      margin-bottom: 60px;
+      color: var(--text-color);
+    }
+
+    .process-steps {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+    }
+
+    .process-step {
+      text-align: center;
+      padding: 30px 20px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .process-step::before {
+      content: attr(data-step);
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #4A55FF, #ff6f00);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: white;
+    }
+
+    .process-step:hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .process-step h4 {
+      margin: 20px 0 10px;
+      color: var(--text-color);
+      font-size: 1.1rem;
+    }
+
+    .process-step p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .services-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+      
+      .process-steps {
+        grid-template-columns: 1fr;
+      }
+      
+      .tech-logos {
+        gap: 15px;
+      }
+      
+      .tech-logo {
+        padding: 15px 20px;
+      }
+    }
+  </style>
+</head>
+<body class="loading">
+  <div class="loader-wrapper"> <div class="loader"></div> </div>
+
+  <nav>
+    <div class="nav-container">
+      <div class="logo">
+        <a href="index.html"><img src="./images/setica-preview.jpg" alt="Setica Logo"></a>
+      </div>
+      <div class="nav-links">
+        <a href="solutions.html">Solutions</a>
+        <a href="about.html">About</a>
+        <a href="products.html">Products</a>
+        <a href="services.html" class="active">Services</a>
+      </div>
+      <div class="love-button-container" id="love-it-button">
+        <span class="heart-icon">❤️</span>
+        <span class="love-count" id="love-counter">0</span>
+      </div>
+      <div class="cta-buttons">
+        <a href="join-waitlist.html" class="btn btn-primary">Join Waitlist</a>
+      </div>
+      <div class="hamburger"> <span></span> <span></span> <span></span> </div>
+    </div>
+  </nav>
+
+  <header class="services-hero">
+    <div class="services-hero-content">
+      <h1>Premium Development Services</h1>
+      <p>Transform your vision into reality with our cutting-edge development and AI solutions. From mobile apps to intelligent automation, we deliver excellence.</p>
+    </div>
+  </header>
+
+  <section class="services-section">
+    <div class="services-grid">
+      
+      <!-- Service 1: App Development -->
+      <div class="service-card">
+        <div class="service-card-content">
+          <div class="service-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <h3>Mobile App Development</h3>
+          <p>Cross-platform mobile applications built with React Native for seamless iOS and Android experiences.</p>
+          <ul class="service-features">
+            <li><i class="fas fa-check-circle"></i> React Native development</li>
+            <li><i class="fas fa-check-circle"></i> Native performance optimization</li>
+            <li><i class="fas fa-check-circle"></i> Cross-platform compatibility</li>
+            <li><i class="fas fa-check-circle"></i> App Store & Play Store deployment</li>
+            <li><i class="fas fa-check-circle"></i> Push notifications & analytics</li>
+          </ul>
+          <a href="mailto:lingamvamshikrishnareddy@gmail.com" class="service-cta">
+            Get Started <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Service 2: Web Development -->
+      <div class="service-card">
+        <div class="service-card-content">
+          <div class="service-icon">
+            <i class="fas fa-code"></i>
+          </div>
+          <h3>Web Development & PWA</h3>
+          <p>Modern web applications with MERN stack, TypeScript, and Next.js optimized for performance and SEO.</p>
+          <ul class="service-features">
+            <li><i class="fas fa-check-circle"></i> MERN Stack (MongoDB, Express, React, Node.js)</li>
+            <li><i class="fas fa-check-circle"></i> TypeScript & Next.js</li>
+            <li><i class="fas fa-check-circle"></i> Progressive Web Apps (PWA)</li>
+            <li><i class="fas fa-check-circle"></i> ChatGPT-powered SEO ranking</li>
+            <li><i class="fas fa-check-circle"></i> Responsive & accessible design</li>
+          </ul>
+          <a href="mailto:lingamvamshikrishnareddy@gmail.com" class="service-cta">
+            Get Started <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Service 3: Lead Generation -->
+      <div class="service-card">
+        <div class="service-card-content">
+          <div class="service-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3>Lead Collection & Management</h3>
+          <p>Comprehensive lead generation systems with advanced CRM integration and automation workflows.</p>
+          <ul class="service-features">
+            <li><i class="fas fa-check-circle"></i> Custom lead capture forms</li>
+            <li><i class="fas fa-check-circle"></i> CRM integration & automation</li>
+            <li><i class="fas fa-check-circle"></i> Lead scoring & qualification</li>
+            <li><i class="fas fa-check-circle"></i> Email marketing automation</li>
+            <li><i class="fas fa-check-circle"></i> Analytics & conversion tracking</li>
+          </ul>
+          <a href="mailto:lingamvamshikrishnareddy@gmail.com" class="service-cta">
+            Get Started <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Service 4: Marketing Services -->
+      <div class="service-card">
+        <div class="service-card-content">
+          <div class="service-icon">
+            <i class="fas fa-bullhorn"></i>
+          </div>
+          <h3>Multi-Platform Marketing</h3>
+          <p>Strategic marketing campaigns across Instagram, Reddit, X (Twitter), WeChat, and LinkedIn with comprehensive metrics.</p>
+          <ul class="service-features">
+            <li><i class="fas fa-check-circle"></i> Instagram marketing & growth</li>
+            <li><i class="fas fa-check-circle"></i> Reddit community engagement</li>
+            <li><i class="fas fa-check-circle"></i> X (Twitter) strategy & automation</li>
+            <li><i class="fas fa-check-circle"></i> LinkedIn B2B outreach</li>
+            <li><i class="fas fa-check-circle"></i> WeChat international reach</li>
+            <li><i class="fas fa-check-circle"></i> Comprehensive analytics dashboard</li>
+          </ul>
+          <a href="mailto:lingamvamshikrishnareddy@gmail.com" class="service-cta">
+            Get Started <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Service 5: AI Solutions -->
+      <div class="service-card">
+        <div class="service-card-content">
+          <div class="service-icon">
+            <i class="fas fa-brain"></i>
+          </div>
+          <h3>AI Model Fine-tuning & Chatbots</h3>
+          <p>Custom AI solutions including SLM/LLM fine-tuning, RAG implementation, and intelligent chatbot development.</p>
+          <ul class="service-features">
+            <li><i class="fas fa-check-circle"></i> Small & Large Language Model fine-tuning</li>
+            <li><i class="fas fa-check-circle"></i> External RAG (Retrieval Augmented Generation)</li>
+            <li><i class="fas fa-check-circle"></i> Custom AI chatbot development</li>
+            <li><i class="fas fa-check-circle"></i> AI agent orchestration</li>
+            <li><i class="fas fa-check-circle"></i> Domain-specific model training</li>
+            <li><i class="fas fa-check-circle"></i> API integration & deployment</li>
+          </ul>
+          <a href="mailto:lingamvamshikrishnareddy@gmail.com" class="service-cta">
+            Get Started <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Tech Stack -->
+  <section class="tech-stack-section">
+    <h2>Our Technology Stack</h2>
+    <p>We leverage cutting-edge technologies to deliver robust, scalable solutions</p>
+    <div class="tech-logos">
+      <div class="tech-logo">
+        <i class="fab fa-react"></i>
+        <span>React & React Native</span>
+      </div>
+      <div class="tech-logo">
+        <i class="fab fa-node-js"></i>
+        <span>Node.js</span>
+      </div>
+      <div class="tech-logo">
+        <i class="fab fa-js"></i>
+        <span>TypeScript</span>
+      </div>
+      <div class="tech-logo">
+        <i class="fab fa-python"></i>
+        <span>Python</span>
+      </div>
+      <div class="tech-logo">
+        <i class="fas fa-database"></i>
+        <span>MongoDB</span>
+      </div>
+      <div class="tech-logo">
+        <i class="fas fa-robot"></i>
+        <span>OpenAI & Claude</span>
+      </div>
+      <div class="tech-logo">
+        <i class="fab fa-aws"></i>
+        <span>AWS</span>
+      </div>
+      <div class="tech-logo">
+        <i class="fas fa-layer-group"></i>
+        <span>Next.js</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Process -->
+  <section class="process-section">
+    <h2>Our Development Process</h2>
+    <div class="process-steps">
+      <div class="process-step" data-step="1">
+        <h4>Discovery</h4>
+        <p>Understanding your vision, requirements, and business goals</p>
+      </div>
+      <div class="process-step" data-step="2">
+        <h4>Design</h4>
+        <p>Creating intuitive interfaces and user experiences</p>
+      </div>
+      <div class="process-step" data-step="3">
+        <h4>Development</h4>
+        <p>Building with cutting-edge technologies and best practices</p>
+      </div>
+      <div class="process-step" data-step="4">
+        <h4>Testing</h4>
+        <p>Rigorous quality assurance and performance optimization</p>
+      </div>
+      <div class="process-step" data-step="5">
+        <h4>Deployment</h4>
+        <p>Launch and ongoing support with monitoring</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section id="cta" class="cta-section">
+    <div class="overlay"></div>
+    <div class="cta-content">
+      <h2>Ready to Build Something Amazing?</h2>
+      <p>Let's discuss your project and create exceptional digital experiences together.</p>
+      <a href="mailto:lingamvamshikrishnareddy@gmail.com" class="btn btn-cta">CONTACT US →</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-left">
+        <img src="./images/setica-preview.jpg" alt="Setica Logo">
+        <p>Copyright © <span id="copyright-year">2024</span> Setica.<br>All rights reserved.</p>
+        <p style="margin-top: 15px; font-size: 0.8rem;">An open-source initiative.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-column">
+          <h3>Platform</h3>
+          <ul>
+            <li><a href="solutions.html">Solutions</a></li>
+            <li><a href="products.html">Product Roadmap</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="about.html">About Setica</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+            <li><a href="#">Documentation (Upcoming)</a></li>
+            <li><a href="#">API Reference (Upcoming)</a></li>
+            <li><a href="#">Contribution Guide</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="#">Careers (Coming Soon)</a></li>
+            <li><a href="mailto:lingamvamshikrishnareddy@gmail.com">Contact</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-social">
+        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        <a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>Made with <i class="fas fa-heart heart-icon"></i> and Open Source principles. Site developed with assistance from Claude.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const body = document.body;
+      
+      // Loader
+      window.addEventListener('load', () => { 
+        body.classList.remove('loading'); 
+        body.classList.add('loaded'); 
+      });
+      body.classList.add('loading');
+
+      // Copyright Year
+      const yearSpan = document.getElementById('copyright-year');
+      if (yearSpan) { 
+        yearSpan.textContent = new Date().getFullYear(); 
+      }
+
+      // Mobile Menu
+      const hamburger = document.querySelector('.hamburger');
+      const mobileMenu = document.querySelector('.nav-links');
+      if (hamburger && mobileMenu) {
+        hamburger.addEventListener('click', () => {
+          hamburger.classList.toggle('active');
+          mobileMenu.classList.toggle('active');
+        });
+      }
+
+      // Love Counter
+      const loveButton = document.getElementById('love-it-button');
+      const loveCounterSpan = document.getElementById('love-counter');
+      const localStorageKey = 'seticaLoveCount';
+      const lovedStateKey = 'seticaLovedState';
+      let currentLoveCount = parseInt(localStorage.getItem(localStorageKey) || '0');
+      let userHasLoved = localStorage.getItem(lovedStateKey) === 'true';
+      
+      function updateLoveDisplay() {
+        if(loveCounterSpan) loveCounterSpan.textContent = currentLoveCount;
+        if(loveButton) {
+          if(userHasLoved) loveButton.classList.add('loved');
+          else loveButton.classList.remove('loved');
+        }
+      }
+      
+      if (loveButton && loveCounterSpan) {
+        updateLoveDisplay();
+        loveButton.addEventListener('click', () => {
+          if (!userHasLoved) {
+            currentLoveCount++;
+            userHasLoved = true;
+            localStorage.setItem(localStorageKey, currentLoveCount);
+            localStorage.setItem(lovedStateKey, 'true');
+            updateLoveDisplay();
+            if (typeof gsap !== 'undefined') {
+              gsap.fromTo(loveButton.querySelector('.heart-icon'), 
+                { scale: 1 }, 
+                { scale: 1.4, duration: 0.3, ease: 'back.out(3)', yoyo: true, repeat: 1 }
+              );
+            }
+          } else {
+            if (typeof gsap !== 'undefined') {
+              gsap.fromTo(loveButton, 
+                {x: 0}, 
+                {x: 5, duration:0.1, repeat: 3, yoyo: true, clearProps: "x"}
+              );
+            }
+          }
+        });
+      }
+
+      // Nav Scroll Effect
+      const nav = document.querySelector('nav');
+      if (nav && typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.create({
+          start: "top top",
+          end: 99999,
+          onUpdate: (self) => {
+            if (self.scroll() > 50) {
+              nav.classList.add('scrolled');
+            } else {
+              nav.classList.remove('scrolled');
+            }
+          }
+        });
+      }
+
+      // GSAP Animations
+      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        // Animate Service Cards
+        gsap.utils.toArray('.service-card').forEach((card, index) => {
+          gsap.from(card, {
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              end: "bottom 15%",
+              toggleActions: "play none none reverse"
+            },
+            opacity: 0,
+            y: 60,
+            duration: 0.7,
+            ease: "power2.out",
+            delay: index * 0.1
+          });
+        });
+
+        // Animate Process Steps
+        gsap.utils.toArray('.process-step').forEach((step, index) => {
+          gsap.from(step, {
+            scrollTrigger: {
+              trigger: step,
+              start: "top 85%",
+              toggleActions: "play none none reverse"
+            },
+            opacity: 0,
+            scale: 0.8,
+            duration: 0.5,
+            ease: "back.out(1.7)",
+            delay: index * 0.1
+          });
+        });
+
+        // Animate Tech Logos
+        gsap.utils.toArray('.tech-logo').forEach((logo, index) => {
+          gsap.from(logo, {
+            scrollTrigger: {
+              trigger: logo,
+              start: "top 90%",
+              toggleActions: "play none none reverse"
+            },
+            opacity: 0,
+            y: 30,
+            duration: 0.5,
+            ease: "power2.out",
+            delay: index * 0.05
+          });
+        });
+
+        // Hero Animation
+        gsap.from('.services-hero-content h1', {
+          opacity: 0,
+          y: 50,
+          duration: 1,
+          ease: "power3.out",
+          delay: 0.3
+        });
+
+        gsap.from('.services-hero-content p', {
+          opacity: 0,
+          y: 30,
+          duration: 0.8,
+          ease: "power2.out",
+          delay: 0.6
+        });
+      }
+
+      // Smooth Scroll for CTA
+      const ctaLinks = document.querySelectorAll('a[href^="#"]');
+      ctaLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          const href = link.getAttribute('href');
+          if (href !== '#') {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth' });
+            }
+          }
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

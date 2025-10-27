@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Setica | Our Mission & Vision</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js" defer></script>
+
+  <style>
+    .loader-wrapper { position: fixed; inset: 0; background-color: #111; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease-out; }
+    .loader { border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loaded .loader-wrapper { opacity: 0; visibility: hidden; }
+
+    .footer-love { display: flex; align-items: center; gap: 10px; background-color: rgba(255, 255, 255, 0.08); padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: background-color 0.3s ease; user-select: none; }
+    .footer-love:hover { background-color: rgba(255, 255, 255, 0.15); }
+    .footer-love .heart-icon { color: #ff4757; font-size: 1.1rem; transition: transform 0.2s ease; }
+    .footer-love.loved .heart-icon { transform: scale(1.2); }
+    .footer-love .love-count { font-weight: 600; font-size: 0.9rem; color: var(--text-color); }
+    .footer-love .love-text { font-size: 0.9rem; color: var(--text-muted); }
+
+    .page-header {
+      min-height: 350px;
+      display: flex; flex-direction: column; justify-content: center;
+      align-items: center; text-align: center; position: relative;
+      padding: 140px 5% 80px;
+      background-color: var(--dark-bg);
+      color: var(--text-color);
+      overflow: hidden;
+    }
+    .page-header h1 {
+      font-size: clamp(2.5rem, 6vw, 3.8rem);
+      color: var(--text-color); margin-bottom: 1rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .page-header p.subtitle {
+      font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+      max-width: 750px; margin: 0 auto; color: var(--text-muted);
+    }
+
+    #mission-vision-section {
+      padding: 80px 5%;
+      background-color: var(--dark-card, #1A1A2E);
+      color: var(--text-color);
+    }
+    .mission-vision-container {
+      max-width: 1100px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 50px;
+      text-align: center;
+    }
+    @media (min-width: 768px) {
+      .mission-vision-container {
+        grid-template-columns: 1fr 1fr;
+        text-align: left;
+      }
+    }
+
+    .mission-block, .vision-block {
+      padding: 30px;
+      border-radius: var(--border-radius);
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transform: translateZ(0);
+    }
+    .mission-block:hover, .vision-block:hover {
+      transform: translateY(-5px) translateZ(0);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .mission-block h2, .vision-block h2 {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 1.8rem; color: var(--text-color); margin-bottom: 1.5rem;
+      justify-content: center;
+    }
+    @media (min-width: 768px) {
+      .mission-block h2, .vision-block h2 {
+        justify-content: flex-start;
+      }
+    }
+
+    .mission-block h2 i, .vision-block h2 i {
+      font-size: 1.5em;
+      color: var(--primary-color);
+      line-height: 1;
+    }
+    .mission-block p, .vision-block p {
+      font-size: 1.05rem; line-height: 1.7; color: var(--text-muted);
+      max-width: 500px;
+      margin-left: auto; margin-right: auto;
+    }
+    @media (min-width: 768px) {
+      .mission-block p, .vision-block p {
+        margin-left: 0; margin-right: 0;
+      }
+    }
+
+    #about-content {
+      padding: 80px 5%;
+    }
+    #about-content .section-wrapper.reverse .content-left {
+      text-align: center;
+    }
+    #about-content .image-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    #about-content .image-container img {
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow-light);
+      max-width: 100%; height: auto; display: block;
+    }
+    #about-content .image-container p {
+      font-size: 0.9rem; color: var(--text-muted-light); margin-top: 10px; text-align: center;
+    }
+
+    #about-content .core-values {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    /* Glassmorphism Value Cards - Matching Services Style */
+    .value-item {
+      position: relative;
+      padding: 35px 30px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .value-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(74, 85, 255, 0.05) 0%, rgba(255, 111, 0, 0.05) 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .value-item:hover::before {
+      opacity: 1;
+    }
+
+    /* Animated Border */
+    .value-item::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2px;
+      background: linear-gradient(135deg, #4A55FF, #ff6f00, #4A55FF);
+      background-size: 200% 200%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      animation: borderMove 3s linear infinite;
+    }
+
+    @keyframes borderMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .value-item:hover::after {
+      opacity: 1;
+    }
+
+    .value-item:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 60px rgba(74, 85, 255, 0.2);
+    }
+
+    .value-item i {
+      position: relative;
+      z-index: 1;
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, #4A55FF, #ff6f00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 20px;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .value-item:hover i {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .value-item h3 {
+      position: relative;
+      z-index: 1;
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+      color: var(--text-color-light);
+      font-weight: 700;
+    }
+
+    .value-item p {
+      position: relative;
+      z-index: 1;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text-muted-light);
+      margin-bottom: 0;
+    }
+
+    .founder-section {
+      background-color: var(--dark-bg);
+      padding: 80px 5%;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .founder-section h2 {
+      color: var(--text-color); margin-bottom: 1.5rem; font-size: clamp(2rem, 5vw, 2.8rem);
+    }
+    .founder-section > p.intro {
+      margin-bottom: 60px; font-size: 1.15rem; max-width: 700px; margin-left: auto; margin-right: auto;
+    }
+
+    .founder-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      max-width: 900px; margin: 0 auto;
+      text-align: left;
+    }
+    @media (min-width: 768px) {
+      .founder-container {
+        flex-direction: row;
+        gap: 60px;
+      }
+    }
+
+    .founder-profile {
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .founder-profile img {
+      width: 180px; height: 180px;
+      border-radius: 50%; margin: 0 auto 20px; object-fit: cover;
+      border: 4px solid var(--primary-color);
+      display: block;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transform: translateZ(0);
+    }
+    .founder-profile img:hover {
+      transform: scale(1.05) translateZ(0);
+      box-shadow: 0 0 25px rgba(var(--primary-color-rgb), 0.6);
+    }
+
+    .founder-profile h3 {
+      font-size: 1.6rem; color: var(--text-color); margin-bottom: 5px;
+    }
+    .founder-profile span {
+      font-size: 1rem; color: var(--text-muted); display: block; margin-bottom: 15px;
+    }
+
+    .founder-bio {
+      font-size: 1.05rem; line-height: 1.7; color: var(--text-muted);
+    }
+    .founder-bio p { margin-bottom: 1.5rem; }
+    .founder-bio strong { color: var(--text-color); font-weight: 600; }
+
+    .contact-info {
+      margin-top: 20px;
+    }
+
+    .contact-info a {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 10px 20px;
+      border-radius: var(--border-radius);
+      background-color: var(--primary-color); color: white;
+      font-weight: 600; text-decoration: none;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .contact-info a:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      text-decoration: none;
+    }
+
+    .stars, .twinkling { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; display: block; z-index: 0;}
+    .stars { background: #000 url(https://www.script-tutorials.com/demos/360/images/stars.png) repeat top center; z-index: 0; }
+    .twinkling{ background: transparent url(https://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center; z-index: 1; animation: move-twink-back 200s linear infinite; }
+    @keyframes move-twink-back { from {background-position:0 0;} to {background-position:-10000px 5000px;} }
+
+    .page-header .header-content { z-index: 5; position: relative; }
+
+    .nav-links.active { }
+    .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+    .mobile-menu-overlay.active { opacity: 1; visibility: visible; }
+  </style>
+</head>
+<body class="loading">
+
+  <div class="loader-wrapper"> <div class="loader"></div> </div>
+
+  <nav>
+    <div class="nav-container">
+      <div class="logo">
+        <a href="index.html"><img src="images/setica-preview.jpg" alt="Setica Logo"></a>
+      </div>
+      <div class="nav-links">
+        <a href="solutions.html">Solutions</a>
+        <a href="about.html" class="active">About</a>
+        <a href="products.html">Products</a>
+        <a href="services.html">Services</a>
+        <a href="join-waitlist.html" class="btn btn-primary mobile-cta-button">Join Waitlist</a>
+      </div>
+      <div class="love-button-container" id="love-it-button">
+        <span class="heart-icon">❤️</span>
+        <span class="love-count" id="love-counter">0</span>
+      </div>
+      <div class="cta-buttons">
+        <a href="join-waitlist.html" class="btn btn-primary" id="nav-start-free">Join Waitlist</a>
+      </div>
+      <div class="hamburger"> <span></span> <span></span> <span></span> </div>
+    </div>
+  </nav>
+  <div class="mobile-menu-overlay"></div>
+
+  <header class="page-header">
+    <div class="stars"></div> <div class="twinkling"></div>
+    <div class="header-content">
+      <h1 class="animate-text">Simplifying Life Through Integration</h1>
+      <p class="subtitle animate-text-delay">Discover the driving force behind Setica – our mission, vision, and commitment to open-source innovation.</p>
+    </div>
+  </header>
+
+  <section id="mission-vision-section">
+    <div class="mission-vision-container">
+      <div class="mission-block">
+        <h2><i class="fas fa-bullseye"></i>Our Mission</h2>
+        <p>To empower individuals by simplifying digital complexity through a unified, intuitive, and open-source platform that seamlessly integrates the essential tools for modern life.</p>
+      </div>
+      <div class="vision-block">
+        <h2><i class="fas fa-eye"></i>Our Vision</h2>
+        <p>To foster a global community building and benefiting from ethical, user-centric technology that enhances human connection, productivity, and well-being, free from data exploitation.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="about-content" class="light-section">
+    <div class="section-wrapper reverse">
+      <div class="content-left">
+        <div class="image-container">
+          <img src="vamshikrishnareddy_Lingam__imagine_prompt__Minimalist_abstract_visualization_33bca415-7a58-4ba1-9300-99bd347ce25a.png" alt="Abstract visualization of integrated digital tools">
+          <p>Conceptualizing the Setica Ecosystem</p>
+        </div>
+      </div>
+      <div class="content-right">
+        <h2>Technology Designed for Humans</h2>
+        <p>Setica is more than just software; it's an ambitious <strong>open-source ecosystem</strong> designed to tackle the fragmentation and complexity of our digital lives. We believe technology should serve people, adapting to their needs, not the other way around.</p>
+        <p>By combining cutting-edge interaction design with robust engineering, we're building a unified platform where disparate digital tools converge into a seamless, intuitive experience. Our goal is to reduce friction and empower users to focus on what truly matters.</p>
+        <hr style="border: 0; height: 1px; background-color: rgba(0,0,0,0.1); margin: 30px 0;">
+        <h3 style="margin-bottom: 20px; font-size: 1.5rem; color: var(--text-color-light);">Our Core Values</h3>
+        <div class="core-values">
+          <div class="value-item">
+            <i class="fas fa-users-cog"></i>
+            <h3>Community & Openness</h3>
+            <p>Built collaboratively with transparency. Open source isn't just code; it's our philosophy.</p>
+          </div>
+          <div class="value-item">
+            <i class="fas fa-link"></i>
+            <h3>Seamless Integration</h3>
+            <p>Connecting the dots between digital tools and daily tasks for effortless workflows.</p>
+          </div>
+          <div class="value-item">
+            <i class="fas fa-compass-drafting"></i>
+            <h3>User-Centric Design</h3>
+            <p>Prioritizing intuitive interfaces and meaningful interactions that genuinely simplify.</p>
+          </div>
+          <div class="value-item">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Privacy & Ethics</h3>
+            <p>Committed to ethical practices and respecting user privacy by design.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="founder-section">
+    <h2>Meet the Founder</h2>
+    <p class="intro">Setica is currently driven by an individual passion for creating better, more integrated technology.</p>
+
+    <div class="founder-container">
+      <div class="founder-profile">
+        <img src="profile.jpg" alt="Lingam Vamshi Krishna Reddy Profile Picture">
+        <h3>Lingam Vamshi Krishna Reddy</h3>
+        <span>Founder - Indie Developer & AI Researcher</span>
+      </div>
+
+      <div class="founder-bio">
+        <p>Hi, I'm Vamshi. As an indie developer fascinated by the potential of technology to improve our lives, I started Setica to address the digital clutter and disjointed experiences I saw everywhere. My goal is to build tools that feel less like applications and more like natural extensions of our intentions.</p>
+        <p><strong>Setica is born from the belief that complexity can be elegant, and that open collaboration leads to stronger, more ethical solutions.</strong> While currently an indie project, the vision is much larger – a thriving ecosystem built with and for the community.</p>
+        <p>I'm excited about the future and the innovative products planned under the Setica umbrella. Let's build something amazing together.</p>
+        <div class="contact-info">
+          <a href="mailto:lingamvamshikrishnareddy@gmail.com" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-paper-plane"></i> Get In Touch
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cta" class="cta-section">
+    <div class="overlay"></div>
+    <div class="cta-content">
+      <h2>Be Part of the Journey</h2>
+      <p>Follow the project's progress, contribute ideas, or join the waitlist to be notified about upcoming launches.</p>
+      <a href="join-waitlist.html" class="btn btn-cta" id="cta-start-free">JOIN WAITLIST →</a>
+      <a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="margin-left: 15px; margin-top: 10px; background: rgba(255,255,255,0.8); color: var(--dark-bg);">
+        <i class="fab fa-github"></i> View on GitHub
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-left">
+        <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 10px;">Setica</div>
+        <p>Copyright © <span id="copyright-year">2024</span> Setica.<br>All rights reserved.</p>
+        <p style="margin-top: 15px; font-size: 0.8rem;">An open-source initiative by Lingam Vamshi Krishna Reddy.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-column">
+          <h3>Platform</h3>
+          <ul>
+            <li><a href="solutions.html">Solutions</a></li>
+            <li><a href="products.html">Product Roadmap</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="about.html">About Setica</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+            <li><a href="#">Documentation (Upcoming)</a></li>
+            <li><a href="#">API Reference (Upcoming)</a></li>
+            <li><a href="#">Contribution Guide</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="#">Careers (Coming Soon)</a></li>
+            <li><a href="mailto:lingamvamshikrishnareddy@gmail.com">Contact</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-social">
+        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        <a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>Made with <i class="fas fa-heart heart-icon"></i> and Open Source principles. Site developed with assistance from Claude.</p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      document.addEventListener('DOMContentLoaded', () => {
+        const body = document.body;
+
+        window.addEventListener('load', () => {
+          body.classList.remove('loading');
+          body.classList.add('loaded');
+          const loaderWrapper = document.querySelector('.loader-wrapper');
+          if (typeof gsap !== 'undefined') {
+            gsap.to(loaderWrapper, { opacity: 0, duration: 0.5, ease: 'power1.out', onComplete: () => loaderWrapper.style.display = 'none' });
+          } else if (loaderWrapper) {
+            loaderWrapper.style.opacity = '0';
+            setTimeout(() => loaderWrapper.style.display = 'none', 500);
+          }
+
+          if (typeof gsap !== 'undefined') {
+            gsap.from('.page-header h1', { opacity: 0, y: 30, duration: 0.8, delay: 0.1, ease: 'power2.out' });
+            gsap.from('.page-header p.subtitle', { opacity: 0, y: 30, duration: 0.8, delay: 0.3, ease: 'power2.out' });
+          }
+        });
+        
+        body.classList.add('loading');
+        
+        setTimeout(() => {
+          if (body.classList.contains('loading')) {
+            body.classList.remove('loading'); body.classList.add('loaded');
+            const loaderWrapper = document.querySelector('.loader-wrapper');
+            if (loaderWrapper) { loaderWrapper.style.opacity = '0'; loaderWrapper.style.display = 'none';}
+            if (typeof gsap !== 'undefined') {
+              gsap.from('.page-header h1', { opacity: 0, y: 30, duration: 0.8, delay: 0.1, ease: 'power2.out' });
+              gsap.from('.page-header p.subtitle', { opacity: 0, y: 30, duration: 0.8, delay: 0.3, ease: 'power2.out' });
+            }
+          }
+        }, 3500);
+
+        const yearSpan = document.getElementById('copyright-year');
+        if (yearSpan) {
+          yearSpan.textContent = new Date().getFullYear();
+        }
+
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
+
+        if (hamburger && navLinks && mobileMenuOverlay) {
+          hamburger.addEventListener('click', () => {
+            const isActive = hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active', isActive);
+            mobileMenuOverlay.classList.toggle('active', isActive);
+            document.body.style.overflow = isActive ? 'hidden' : '';
+          });
+
+          mobileMenuOverlay.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navLinks.classList.remove('active');
+            mobileMenuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+          });
+
+          navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+              if (hamburger.classList.contains('active')) {
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || href === 'about.html' || href === 'solutions.html' || href === 'products.html' || href === 'services.html') {
+                  hamburger.classList.remove('active');
+                  navLinks.classList.remove('active');
+                  mobileMenuOverlay.classList.remove('active');
+                  document.body.style.overflow = '';
+                }
+              }
+            });
+          });
+        }
+
+        const loveButton = document.getElementById('love-it-button');
+        const loveCounterSpan = document.getElementById('love-counter');
+        if (loveButton && loveCounterSpan) {
+          const localStorageKey = 'seticaLoveCount';
+          const lovedStateKey = 'seticaLovedState_AboutPage';
+          let currentLoveCount = parseInt(localStorage.getItem(localStorageKey) || '0');
+          let userHasLovedThisPage = localStorage.getItem(lovedStateKey) === 'true';
+
+          const updateLoveDisplay = () => {
+            loveCounterSpan.textContent = currentLoveCount;
+            loveButton.classList.toggle('loved', userHasLovedThisPage);
+          };
+
+          updateLoveDisplay();
+
+          loveButton.addEventListener('click', () => {
+            if (!userHasLovedThisPage) {
+              currentLoveCount++;
+              userHasLovedThisPage = true;
+              localStorage.setItem(localStorageKey, currentLoveCount);
+              localStorage.setItem(lovedStateKey, 'true');
+              updateLoveDisplay();
+
+              if (typeof gsap !== 'undefined') {
+                gsap.fromTo(loveButton.querySelector('.heart-icon'), { scale: 1 }, { scale: 1.4, duration: 0.3, ease: 'back.out(3)', yoyo: true, repeat: 1 });
+              }
+            } else {
+              if (typeof gsap !== 'undefined') {
+                gsap.fromTo(loveButton, {x: 0}, {x: 5, duration:0.1, repeat: 3, yoyo: true, clearProps: "x"});
+              }
+            }
+          });
+        }
+
+        const nav = document.querySelector('nav');
+        if (nav && typeof ScrollTrigger !== 'undefined') {
+          ScrollTrigger.create({
+            start: "top -80",
+            end: 99999,
+            toggleClass: { targets: nav, className: "scrolled" }
+          });
+        } else if (nav) {
+          window.addEventListener('scroll', () => {
+            if (window.scrollY > 80) {
+              nav.classList.add('scrolled');
+            } else {
+              nav.classList.remove('scrolled');
+            }
+          }, { passive: true });
+        }
+
+        if (typeof gsap !== 'undefined') {
+          const sectionsToAnimate = gsap.utils.toArray(
+            '#mission-vision-section .mission-block, #mission-vision-section .vision-block, #about-content .section-wrapper > *, .value-item, .founder-section > *, #cta .cta-content > *'
+          );
+
+          sectionsToAnimate.forEach(el => {
+            if (el.classList.contains('content-left') && el.querySelector('.image-container')) {
+              const img = el.querySelector('img');
+              if(img) {
+                gsap.from(img, { opacity: 0, scale: 0.9, duration: 0.8, ease: 'power1.out', scrollTrigger:{ trigger: img, start: 'top 90%', toggleActions: 'play none none none', once: true }});
+              }
+              return;
+            }
+
+            gsap.from(el, {
+              opacity: 0,
+              y: 50,
+              duration: 0.8,
+              ease: 'power1.out',
+              scrollTrigger: {
+                trigger: el,
+                start: 'top 90%',
+                toggleActions: 'play none none none',
+                once: true
+              }
+            });
+          });
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>

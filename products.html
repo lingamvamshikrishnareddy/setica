@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Roadmap | Setica - The Everything App for Your Life</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    .loader-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #111; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease-out, visibility 0.5s ease-out; }
+    .loader { border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loaded .loader-wrapper { opacity: 0; visibility: hidden; }
+
+    .page-header {
+      min-height: 300px; display: flex; flex-direction: column; justify-content: center;
+      align-items: center; text-align: center; position: relative;
+      padding: 120px 5% 60px; background-color: var(--dark-bg);
+      overflow: hidden;
+    }
+    .page-header h1 { font-size: clamp(2.2rem, 5vw, 3.5rem); color: var(--text-color); margin-bottom: 1rem; position: relative; z-index: 2;}
+    .page-header p { font-size: clamp(1rem, 2vw, 1.2rem); max-width: 700px; margin: 0 auto; position: relative; z-index: 2;}
+
+    .stars, .twinkling { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; display: block; z-index: 0;}
+    .stars { background: #000 url(https://www.script-tutorials.com/demos/360/images/stars.png) repeat top center; z-index: 0; }
+    .twinkling{ background: transparent url(https://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center; z-index: 1; animation: move-twink-back 200s linear infinite; }
+    @keyframes move-twink-back { from {background-position:0 0;} to {background-position:-10000px 5000px;} }
+
+    .roadmap-section {
+      padding: 80px 5%;
+      background-color: var(--dark-card);
+      position: relative;
+      z-index: 2;
+    }
+
+    .roadmap-timeline {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      padding: 40px 0;
+    }
+
+    .roadmap-timeline::before {
+      content: '';
+      position: absolute;
+      left: 50px;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+      border-radius: 2px;
+      opacity: 0.5;
+    }
+
+    .timeline-phase {
+      margin-bottom: 60px;
+      position: relative;
+    }
+    .timeline-phase:last-child { margin-bottom: 0; }
+
+    .phase-header {
+      background: var(--gradient-primary);
+      color: white;
+      padding: 15px 30px;
+      border-radius: var(--border-radius);
+      display: inline-block;
+      margin-bottom: 30px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      box-shadow: var(--box-shadow);
+      position: relative;
+      left: -15px;
+      z-index: 2;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-left: 100px;
+      margin-bottom: 40px;
+      background-color: rgba(255, 255, 255, 0.04);
+      padding: 25px 30px 25px 100px;
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: var(--transition);
+      overflow: hidden;
+    }
+    .timeline-item:hover {
+      background-color: rgba(255, 255, 255, 0.07);
+      border-color: rgba(var(--primary-color-rgb, 74, 85, 255), 0.3);
+      transform: translateX(5px);
+    }
+
+    .timeline-icon {
+      position: absolute;
+      left: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--dark-card);
+      border: 3px solid var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+    }
+    .timeline-icon i {
+      color: var(--primary-color);
+      font-size: 1.2rem;
+    }
+
+    .timeline-item.status-development .timeline-icon { border-color: var(--primary-color); background-color: var(--dark-bg);}
+    .timeline-item.status-development .timeline-icon i { color: var(--primary-color); }
+    .timeline-item.status-planned .timeline-icon { border-color: var(--secondary-color); background-color: var(--dark-bg);}
+    .timeline-item.status-planned .timeline-icon i { color: var(--secondary-color); }
+    .timeline-item.status-research .timeline-icon { border-color: #00b894; background-color: var(--dark-bg); }
+    .timeline-item.status-research .timeline-icon i { color: #00b894; }
+
+    .timeline-content h3 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: var(--text-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .timeline-content p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
+    .status-tag-roadmap {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 15px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-development .status-tag-roadmap { background-color: rgba(74, 85, 255, 0.2); color: var(--primary-color); }
+    .status-planned .status-tag-roadmap { background-color: rgba(255, 111, 0, 0.2); color: var(--secondary-color); }
+    .status-research .status-tag-roadmap { background-color: rgba(0, 184, 148, 0.2); color: #00b894; }
+
+    @media (max-width: 768px) {
+      .roadmap-timeline::before { left: 25px; }
+      .timeline-item { padding-left: 70px; padding-right: 20px; }
+      .timeline-icon { left: 5px; }
+      .phase-header { font-size: 1.2rem; padding: 12px 20px; left: 0;}
+      .timeline-content h3 { flex-direction: column; align-items: flex-start; gap: 5px;}
+      .status-tag-roadmap { margin-left: 0; margin-top: 5px; }
+    }
+  </style>
+</head>
+<body class="loading">
+  <div class="loader-wrapper"> <div class="loader"></div> </div>
+
+  <nav>
+    <div class="nav-container">
+      <div class="logo">
+        <a href="index.html"><img src="./images/setica-preview.jpg" alt="Setica Logo"></a>
+      </div>
+      <div class="nav-links">
+        <a href="solutions.html">Solutions</a>
+        <a href="about.html">About</a>
+        <a href="products.html" class="active">Products</a>
+        <a href="services.html">Services</a>
+      </div>
+      <div class="love-button-container" id="love-it-button">
+        <span class="heart-icon">❤️</span>
+        <span class="love-count" id="love-counter">0</span>
+      </div>
+      <div class="cta-buttons">
+        <a href="join-waitlist.html" class="btn btn-primary" id="nav-start-free">Join Waitlist</a>
+      </div>
+      <div class="hamburger"> <span></span> <span></span> <span></span> </div>
+    </div>
+  </nav>
+
+  <header class="page-header">
+    <div class="stars"></div> <div class="twinkling"></div>
+    <div class="header-content" style="z-index: 5;">
+      <h1>Product Ecosystem</h1>
+      <p>Our comprehensive suite of integrated solutions spanning healthcare, productivity, mobility, and emerging technologies.</p>
+    </div>
+  </header>
+
+  <section class="roadmap-section">
+    <div class="roadmap-timeline">
+
+      <!-- Phase 1: Foundation & Core Services -->
+      <div class="timeline-phase">
+        <div class="phase-header">Phase 1: Foundation & Core Services</div>
+        
+        <div class="timeline-item status-development">
+          <div class="timeline-icon"><i class="fas fa-briefcase-medical"></i></div>
+          <div class="timeline-content">
+            <h3>Telehealth Platform <span class="status-tag-roadmap">In Development</span></h3>
+            <p>Comprehensive virtual healthcare with consultations, secure health records, and ambulance connectivity.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-development">
+          <div class="timeline-icon"><i class="fas fa-hard-hat"></i></div>
+          <div class="timeline-content">
+            <h3>Jobs Platform <span class="status-tag-roadmap">In Development</span></h3>
+            <p>AI-powered job matching for blue-collar workers with skill verification and career resources.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-development">
+          <div class="timeline-icon"><i class="fas fa-heartbeat"></i></div>
+          <div class="timeline-content">
+            <h3>Health & Fitness Hub <span class="status-tag-roadmap">In Development</span></h3>
+            <p>Centralized wellness tracking with nutrition, workouts, and wearable integration.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-development">
+          <div class="timeline-icon"><i class="fas fa-shield-alt"></i></div>
+          <div class="timeline-content">
+            <h3>Women's Safety Tools <span class="status-tag-roadmap">In Development</span></h3>
+            <p>Real-time location sharing, SOS alerts, and institutional partnerships for enhanced safety.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2: Expanding Services -->
+      <div class="timeline-phase">
+        <div class="phase-header">Phase 2: Service Expansion & Integration</div>
+
+        <div class="timeline-item status-planned">
+          <div class="timeline-icon"><i class="fas fa-cogs"></i></div>
+          <div class="timeline-content">
+            <h3>Enterprise Management SaaS <span class="status-tag-roadmap">Planned</span></h3>
+            <p>Business OS platform with CRM, project management, and workflow automation. Alternative to Zoho and Salesforce.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-planned">
+          <div class="timeline-icon"><i class="fas fa-shipping-fast"></i></div>
+          <div class="timeline-content">
+            <h3>SetCart - Quick Commerce <span class="status-tag-roadmap">Planned</span></h3>
+            <p>Transparent quick commerce with zero dark patterns, connecting users with local stores for rapid delivery.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-planned">
+          <div class="timeline-icon"><i class="fas fa-tools"></i></div>
+          <div class="timeline-content">
+            <h3>Construction & Trades SaaS <span class="status-tag-roadmap">Planned</span></h3>
+            <p>Project management, scheduling, and communication tools for the construction industry.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-planned">
+          <div class="timeline-icon"><i class="fas fa-car"></i></div>
+          <div class="timeline-content">
+            <h3>Vayu Ride Sharing <span class="status-tag-roadmap">Planned</span></h3>
+            <p>Integrated ride-hailing with driver verification, multiple transport options, and loyalty rewards.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-planned">
+          <div class="timeline-icon"><i class="fas fa-calendar-alt"></i></div>
+          <div class="timeline-content">
+            <h3>Gatherly Event Platform <span class="status-tag-roadmap">Planned</span></h3>
+            <p>Event organization, RSVP management, and community gathering discovery.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 3: Advanced Solutions -->
+      <div class="timeline-phase">
+        <div class="phase-header">Phase 3: Advanced Solutions & Tech</div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-traffic-light"></i></div>
+          <div class="timeline-content">
+            <h3>Traffic AI <span class="status-tag-roadmap">Research</span></h3>
+            <p>AI-powered traffic management and route optimization for smart cities.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-spa"></i></div>
+          <div class="timeline-content">
+            <h3>Beauty Care Platform <span class="status-tag-roadmap">Research</span></h3>
+            <p>At-home beauty services, salon booking, and personalized beauty recommendations.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-car-side"></i></div>
+          <div class="timeline-content">
+            <h3>Vehicle Wash Service <span class="status-tag-roadmap">Research</span></h3>
+            <p>On-demand vehicle cleaning and maintenance booking platform.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-hand-holding-medical"></i></div>
+          <div class="timeline-content">
+            <h3>Addiction Recovery App <span class="status-tag-roadmap">Research</span></h3>
+            <p>Support platform for cigarette, alcohol, and substance addiction recovery with community and tracking.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-envelope-open-text"></i></div>
+          <div class="timeline-content">
+            <h3>Cold DM Website <span class="status-tag-roadmap">Research</span></h3>
+            <p>Professional outreach platform for effective cold messaging and lead generation.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-user-shield"></i></div>
+          <div class="timeline-content">
+            <h3>Cyber Shield <span class="status-tag-roadmap">Research</span></h3>
+            <p>Comprehensive cybersecurity platform for personal and business protection.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-user-nurse"></i></div>
+          <div class="timeline-content">
+            <h3>Senior & Baby Care <span class="status-tag-roadmap">Research</span></h3>
+            <p>Specialized care management for elderly and infant monitoring with caregiver coordination.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-clipboard-check"></i></div>
+          <div class="timeline-content">
+            <h3>Client Scope Creep Killer <span class="status-tag-roadmap">Research</span></h3>
+            <p>Project management tool to prevent scope creep with clear boundaries and change tracking.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-link"></i></div>
+          <div class="timeline-content">
+            <h3>Blockchain Solutions <span class="status-tag-roadmap">Research</span></h3>
+            <p>Decentralized applications and blockchain integration for secure transactions.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-graduation-cap"></i></div>
+          <div class="timeline-content">
+            <h3>College Life Management <span class="status-tag-roadmap">Research</span></h3>
+            <p>All-in-one platform for students managing academics, schedules, and campus life.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-robot"></i></div>
+          <div class="timeline-content">
+            <h3>AI Job Application Agent <span class="status-tag-roadmap">Research</span></h3>
+            <p>Automated job searching and application with AI-powered resume optimization.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-heart-broken"></i></div>
+          <div class="timeline-content">
+            <h3>Divorce Support (Men's Focus) <span class="status-tag-roadmap">Research</span></h3>
+            <p>Resources, legal guidance, and emotional support for men navigating divorce.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-comments"></i></div>
+          <div class="timeline-content">
+            <h3>AI Chatbot (SLM Models) <span class="status-tag-roadmap">Research</span></h3>
+            <p>Small language model powered conversational AI for business and personal use.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-cookie-bite"></i></div>
+          <div class="timeline-content">
+            <h3>ChippyChips.in <span class="status-tag-roadmap">Research</span></h3>
+            <p>Pure vegetarian snacks delivery platform celebrating authentic Indian flavors.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-utensils"></i></div>
+          <div class="timeline-content">
+            <h3>BriyaniBro.in <span class="status-tag-roadmap">Research</span></h3>
+            <p>Specialized online food delivery focusing on authentic biryani and regional cuisines.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-om"></i></div>
+          <div class="timeline-content">
+            <h3>Fast & Yoga <span class="status-tag-roadmap">Research</span></h3>
+            <p>Integrated fasting and yoga practice platform for holistic wellness.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-recycle"></i></div>
+          <div class="timeline-content">
+            <h3>Waste Management & Carbon Credits <span class="status-tag-roadmap">Research</span></h3>
+            <p>Sustainable waste management with carbon credit tracking and trading.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-code"></i></div>
+          <div class="timeline-content">
+            <h3>Synaptika AI Agent <span class="status-tag-roadmap">Research</span></h3>
+            <p>AI-powered coding assistant for automated software development and code optimization.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-solar-panel"></i></div>
+          <div class="timeline-content">
+            <h3>Energy Monitor Grid <span class="status-tag-roadmap">Research</span></h3>
+            <p>Smart energy monitoring and solar panel installation management platform.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-building"></i></div>
+          <div class="timeline-content">
+            <h3>Keeper - Resident Portal <span class="status-tag-roadmap">Research</span></h3>
+            <p>Visitor management, maintenance requests, and payment portal for residential communities.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-charging-station"></i></div>
+          <div class="timeline-content">
+            <h3>Kalam EV Vehicle <span class="status-tag-roadmap">Research</span></h3>
+            <p>Quad-motor electric vehicle with specialized lithium battery cells for unmatched reliability.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-film"></i></div>
+          <div class="timeline-content">
+            <h3>Studio Suite <span class="status-tag-roadmap">Research</span></h3>
+            <p>Integrated video editing and design platform for content creators.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-table"></i></div>
+          <div class="timeline-content">
+            <h3>Excel Kitab <span class="status-tag-roadmap">Research</span></h3>
+            <p>Online collaborative spreadsheet platform with advanced data analysis and real-time collaboration features.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-baby"></i></div>
+          <div class="timeline-content">
+            <h3>Baby ScreenRant Killer <span class="status-tag-roadmap">Research</span></h3>
+            <p>Comprehensive parenting app for babies aged 1-5 with nutrition tracking, habit building, memory preservation, developmental checklists, and age-appropriate skill training.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-laugh"></i></div>
+          <div class="timeline-content">
+            <h3>Nexora <span class="status-tag-roadmap">Research</span></h3>
+            <p>Entertainment platform for viral memes, movie shorts, and trending content discovery.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-video"></i></div>
+          <div class="timeline-content">
+            <h3>Pixel Stream <span class="status-tag-roadmap">Research</span></h3>
+            <p>OTT platform dedicated to short films, comedy content, and emerging directors with opera performance streaming.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-rocket"></i></div>
+          <div class="timeline-content">
+            <h3>Startup Fundraising CRM <span class="status-tag-roadmap">Research</span></h3>
+            <p>Comprehensive CRM for startups to manage investor relations, pitch tracking, and fundraising pipelines.</p>
+          </div>
+        </div>
+        
+         <div class="timeline-item status-planned">
+          <div class="timeline-icon"><i class="fas fa-plane-departure"></i></div>
+          <div class="timeline-content">
+            <h3>Yatra - Travel & Hospitality <span class="status-tag-roadmap">Planned</span></h3>
+            <p>Budget travel platform with spiritual travel mode, honeymoon packages, and AI-powered itinerary planning with transparent pricing.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-broadcast-tower"></i></div>
+          <div class="timeline-content">
+            <h3>WaveLink <span class="status-tag-roadmap">Research</span></h3>
+            <p>Video communication platform with integrated Persona AI agent for enhanced meetings and collaboration.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-apple-alt"></i></div>
+          <div class="timeline-content">
+            <h3>Nutrition Buddy <span class="status-tag-roadmap">Research</span></h3>
+            <p>AI-powered meal planning and nutrition tracking with personalized recommendations and recipe suggestions.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-home"></i></div>
+          <div class="timeline-content">
+            <h3>Remis - Real Estate SaaS <span class="status-tag-roadmap">Research</span></h3>
+            <p>Comprehensive real estate management and property search platform.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-newspaper"></i></div>
+          <div class="timeline-content">
+            <h3>User Stories News <span class="status-tag-roadmap">Research</span></h3>
+            <p>Community-driven news platform featuring real user stories and experiences.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-cut"></i></div>
+          <div class="timeline-content">
+            <h3>Online Tailoring <span class="status-tag-roadmap">Research</span></h3>
+            <p>Virtual tailoring services with precise measurements and home delivery.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-chart-line"></i></div>
+          <div class="timeline-content">
+            <h3>Stock & Trading - Quant Trading <span class="status-tag-roadmap">Research</span></h3>
+            <p>Quantitative trading platform with algorithmic strategies and market analysis.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-helicopter"></i></div>
+          <div class="timeline-content">
+            <h3>Drones Logistics Platform <span class="status-tag-roadmap">Research</span></h3>
+            <p>Automated drone delivery network for last-mile logistics.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-bullhorn"></i></div>
+          <div class="timeline-content">
+            <h3>Marketing SaaS - Creator Connect <span class="status-tag-roadmap">Research</span></h3>
+            <p>Platform connecting brands with memers, influencers, and podcasters.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-industry"></i></div>
+          <div class="timeline-content">
+            <h3>Manufacturing SaaS <span class="status-tag-roadmap">Research</span></h3>
+            <p>Production scheduling, quality control, and supply chain management.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-tractor"></i></div>
+          <div class="timeline-content">
+            <h3>FarmiCart <span class="status-tag-roadmap">Research</span></h3>
+            <p>Direct B2B and retail marketplace connecting farmers with better pricing, eliminating middlemen for fair trade.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-cloud"></i></div>
+          <div class="timeline-content">
+            <h3>Cloud Bharath <span class="status-tag-roadmap">Research</span></h3>
+            <p>Indigenous cloud infrastructure platform for Indian businesses.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-wifi"></i></div>
+          <div class="timeline-content">
+            <h3>LiFi Telecommunication <span class="status-tag-roadmap">Research</span></h3>
+            <p>Data-only communication using light fidelity technology at reduced costs.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-brain"></i></div>
+          <div class="timeline-content">
+            <h3>NeuroSync - Brain Interface <span class="status-tag-roadmap">Research</span></h3>
+            <p>Neural chip technology enabling brain-to-brain API communication.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-water"></i></div>
+          <div class="timeline-content">
+            <h3>Ganga - Water Purification <span class="status-tag-roadmap">Research</span></h3>
+            <p>Advanced desalination and water purification converting seawater to fresh water.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item status-research">
+          <div class="timeline-icon"><i class="fas fa-dna"></i></div>
+          <div class="timeline-content">
+            <h3>Mother AI - Life Creation <span class="status-tag-roadmap">Research</span></h3>
+            <p>Biotech platform combining AI with gene editing for assisted reproductive technologies.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cta" class="cta-section">
+    <div class="overlay"></div>
+    <div class="cta-content">
+      <h2>Join Our Innovation Journey</h2>
+      <p>Be part of building the future with our comprehensive product ecosystem.</p>
+      <a href="join-waitlist.html" class="btn btn-cta" id="cta-start-free">JOIN WAITLIST →</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-left">
+        <img src="./images/setica-preview.jpg" alt="Setica Logo">
+        <p>Copyright © <span id="copyright-year">2024</span> Setica.<br>All rights reserved.</p>
+        <p style="margin-top: 15px; font-size: 0.8rem;">An open-source initiative.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-column">
+          <h3>Platform</h3>
+          <ul>
+            <li><a href="solutions.html">Solutions</a></li>
+            <li><a href="products.html">Product Roadmap</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="about.html">About Setica</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+            <li><a href="#">Documentation (Upcoming)</a></li>
+            <li><a href="#">API Reference (Upcoming)</a></li>
+            <li><a href="#">Contribution Guide</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="#">Careers (Coming Soon)</a></li>
+            <li><a href="mailto:lingamvamshikrishnareddy@gmail.com">Contact</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-social">
+        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        <a href="https://github.com/lingamvamshikrishnareddy/setica" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>Made with <i class="fas fa-heart heart-icon"></i> and Open Source principles. Site developed with assistance from Claude.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const body = document.body;
+      window.addEventListener('load', () => { body.classList.remove('loading'); body.classList.add('loaded'); });
+      body.classList.add('loading');
+
+      const yearSpan = document.getElementById('copyright-year');
+      if (yearSpan) { yearSpan.textContent = new Date().getFullYear(); }
+
+      const hamburger = document.querySelector('.hamburger');
+      const mobileMenu = document.querySelector('.nav-links');
+      if (hamburger && mobileMenu) {
+        hamburger.addEventListener('click', () => {
+          hamburger.classList.toggle('active');
+          mobileMenu.classList.toggle('active');
+        });
+      }
+
+      const loveButton = document.getElementById('love-it-button');
+      const loveCounterSpan = document.getElementById('love-counter');
+      const localStorageKey = 'seticaLoveCount';
+      const lovedStateKey = 'seticaLovedState';
+      let currentLoveCount = parseInt(localStorage.getItem(localStorageKey) || '0');
+      let userHasLoved = localStorage.getItem(lovedStateKey) === 'true';
+      
+      function updateLoveDisplay() {
+        if(loveCounterSpan) loveCounterSpan.textContent = currentLoveCount;
+        if(loveButton) {
+          if(userHasLoved) loveButton.classList.add('loved');
+          else loveButton.classList.remove('loved');
+        }
+      }
+      
+      if (loveButton && loveCounterSpan) {
+        updateLoveDisplay();
+        loveButton.addEventListener('click', () => {
+          if (!userHasLoved) {
+            currentLoveCount++;
+            userHasLoved = true;
+            localStorage.setItem(localStorageKey, currentLoveCount);
+            localStorage.setItem(lovedStateKey, 'true');
+            updateLoveDisplay();
+            if (typeof gsap !== 'undefined') {
+              gsap.fromTo(loveButton.querySelector('.heart-icon'), { scale: 1 }, { scale: 1.4, duration: 0.3, ease: 'back.out(3)', yoyo: true, repeat: 1 });
+            }
+          } else {
+            if (typeof gsap !== 'undefined') {
+              gsap.fromTo(loveButton, {x: 0}, {x: 5, duration:0.1, repeat: 3, yoyo: true, clearProps: "x"});
+            }
+          }
+        });
+      }
+
+      const nav = document.querySelector('nav');
+      if (nav && typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.create({
+          start: "top top",
+          end: 99999,
+          onUpdate: (self) => {
+            if (self.scroll() > 50) {
+              nav.classList.add('scrolled');
+            } else {
+              nav.classList.remove('scrolled');
+            }
+          }
+        });
+      }
+
+      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.utils.toArray('.timeline-item').forEach(item => {
+          gsap.from(item, {
+            scrollTrigger: {
+              trigger: item,
+              start: "top 85%",
+              end: "bottom 15%",
+              toggleActions: "play none none reverse"
+            },
+            opacity: 0,
+            x: -60,
+            duration: 0.6,
+            ease: "power2.out",
+            delay: 0.1
+          });
+        });
+        
+        gsap.utils.toArray('.phase-header').forEach(item => {
+          gsap.from(item, {
+            scrollTrigger: {
+              trigger: item,
+              start: "top 90%",
+              toggleActions: "play none none reverse",
+            },
+            opacity: 0,
+            y: 40,
+            duration: 0.5,
+            ease: "power1.out"
+          });
+        });
+      }
+    });
+  </script>
+
+</body>
+</html
